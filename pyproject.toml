@@ -1,0 +1,12 @@
+[project]
+name = "amazing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "mlx",
+]
+
+[tool.uv.sources]
+mlx = { path = "mlx-2.2-py3-ubuntu-any.whl" }

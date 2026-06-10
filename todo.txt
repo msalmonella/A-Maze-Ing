@@ -1,0 +1,2 @@
+==============================================================
+Random seed generator (use whatever hell I want) It must be reproducable so I have to use an algorithm instead of something actual random!
