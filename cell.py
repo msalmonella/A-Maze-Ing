@@ -5,6 +5,8 @@ class Cell:
         self.south = south
         self.west = west
         self.visited: bool = False
+    def __repr__(self) -> str: 
+            return f"N:{int(self.north)} E:{int(self.east)} S:{int(self.south)} W:{int(self.west)}"
 
 def cell_generator(width: int, height: int) -> list[Cell]:
     grid = []
