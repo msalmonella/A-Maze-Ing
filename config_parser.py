@@ -1,3 +1,4 @@
+"""Parses the config.txt"""
 def parse_config(filepath: str) -> dict:
     config = {}
     with open(filepath) as f:
