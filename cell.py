@@ -11,9 +11,9 @@ class Cell:
 """Inserting closed walls to entire map"""
 def cell_generator(width: int, height: int) -> list[Cell]:
     grid = []
-    for _ in range(width):
+    for _ in range(height):
         row = []
-        for _ in range(height):
+        for _ in range(width):
             row.append(Cell()) 
         grid.append(row)
     return grid
