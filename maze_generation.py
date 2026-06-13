@@ -4,11 +4,22 @@ from hex_generation import seed_generator
 
 cfg = parse_config("config.txt")
 
-class Pos:
-    def __init__(self) -> None:
-        self.x: int = 0 
-        self.y: int = 0
-        self.visied = False
+"""Digging into walls"""
+def mazer_the_miner(maze: list, next_pos: tuple, prev_pos: tuple, direction: str) -> None:
+    next_x, next_y = next_pos
+    x, y = prev_pos
+    if (direction == "N"):
+        maze[y][x].north = False
+        maze[next_y][next_x].south = False
+    elif (direction == "S"):
+        maze[y][x].south = False
+        maze[next_y][next_x].north = False
+    elif (direction == "E"):
+        maze[y][x].east = False
+        maze[next_y][next_x].west = False
+    elif (direction == "W"):
+        maze[y][x].west = False
+        maze[next_y][next_x].east = False
 
 """Recursive function to create maze"""
 def generate_maze(x: int, y: int, maze: list) -> None:
@@ -25,6 +36,7 @@ def generate_maze(x: int, y: int, maze: list) -> None:
         elif choice == "W":
             next_x, next_y = x - 1, y
         if 0 <= next_x < cfg["width"] and 0 <= next_y < cfg["height"] and not maze[next_y][next_x].visited:
+            mazer_the_miner(maze, (next_x, next_y), (x, y), choice)
             generate_maze(next_x, next_y, maze)
 
 if __name__ == "__main__":
