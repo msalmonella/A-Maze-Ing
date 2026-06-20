@@ -1,5 +1,5 @@
 from config_parser import parse_config
-from cell import Cell, cell_generator
+from cell import cell_generator
 from seeder import seed_generator
 
 cfg = parse_config("config.txt")
@@ -22,11 +22,12 @@ def mazer_the_miner(maze: list, next_pos: tuple, prev_pos: tuple, direction: str
         maze[next_y][next_x].east = False
 
 """Recursive function to create maze"""
-def generate_maze(x: int, y: int, maze: list) -> None:
+def generate_maze(x: int, y: int, maze: list, rng) -> None:
     maze[y][x].visited = True
     directions = ["N", "E", "S", "W"]
     rng.shuffle(directions)
     for choice in directions:
+        next_x, next_y = x, y
         if choice == "N":
             next_x, next_y = x, y - 1
         elif choice == "S":
@@ -37,11 +38,4 @@ def generate_maze(x: int, y: int, maze: list) -> None:
             next_x, next_y = x - 1, y
         if 0 <= next_x < cfg["width"] and 0 <= next_y < cfg["height"] and not maze[next_y][next_x].visited:
             mazer_the_miner(maze, (next_x, next_y), (x, y), choice)
-            generate_maze(next_x, next_y, maze)
-
-if __name__ == "__main__":
-    rng = seed_generator("salmonella")
-    grid = cell_generator(cfg["width"], cfg["height"])
-    generate_maze(0, 0, grid)
-    for row in grid:
-        print(row)
+            generate_maze(next_x, next_y, maze, rng)
