@@ -1,6 +1,4 @@
 from config_parser import parse_config
-from cell import cell_generator
-from seeder import seed_generator
 
 cfg = parse_config("config.txt")
 
