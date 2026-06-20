@@ -9,7 +9,7 @@ class Cell:
             return f"N:{int(self.north)} E:{int(self.east)} S:{int(self.south)} W:{int(self.west)}"
 
 """Inserting closed walls to entire map"""
-def cell_generator(width: int, height: int) -> list[Cell]:
+def cell_generator(width: int, height: int) -> list[list[Cell]]:
     grid = []
     for _ in range(height):
         row = []
