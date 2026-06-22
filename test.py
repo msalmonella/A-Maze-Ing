@@ -25,11 +25,21 @@ def hex_parser(cell: Cell) -> str:
     return (HEX_MAP_CHARS[hex_val])
 
 
-if __name__ == "__main__":
+def write_hex_to_a_file() -> None:
     rng = seed_generator("salmonella")
     grid = cell_generator(cfg["width"], cfg["height"])
     generate_maze(0, 0, grid, rng)
-    for row in grid:
-        print()
-        for cell in row:
-            print(hex_parser(cell), end="")
+    # for row in grid:
+    #     for cell in row:
+    #         print(hex_parser(cell), end="")
+    #     print()
+    with open(cfg["output_file"], "w") as f:
+        for row in grid:
+            line = ""
+            for cell in row:
+                line += hex_parser(cell)
+            f.write(line + "\n")
+    
+
+if __name__ == "__main__":
+    write_hex_to_a_file()
