@@ -39,7 +39,11 @@ def write_hex_to_a_file() -> None:
             for cell in row:
                 line += hex_parser(cell)
             f.write(line + "\n")
-    
+        f.write("\n")
+        f.write(f"{cfg["entry"][0]},{cfg["entry"][1]}\n")
+        f.write(f"{cfg["exit"][0]},{cfg["exit"][1]}\n")
+        # f.write(shortest_path) ## needs to be coded first.
+        
 
 if __name__ == "__main__":
     write_hex_to_a_file()
