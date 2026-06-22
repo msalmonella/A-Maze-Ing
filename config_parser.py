@@ -13,5 +13,6 @@ def parse_config(filepath: str) -> dict:
             "height": int(config["HEIGHT"]),
             "entry": tuple(int(x) for x in config["ENTRY"].split(",")),
             "exit": tuple(int(x) for x in config["EXIT"].split(",")),
+            "output_file": str(config["OUTPUT_FILE"]),
             "perfect": config["PERFECT"].lower() == "true",
             }
