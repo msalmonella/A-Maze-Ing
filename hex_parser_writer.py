@@ -2,8 +2,15 @@ from seeder import seed_generator
 from cell import Cell, cell_generator
 from maze_generation import generate_maze
 from config_parser import parse_config
+from solver import maze_solver
 
 cfg = parse_config("config.txt")
+
+entry_x, entry_y = cfg["entry"]
+entry_point: tuple[int, int] = entry_x, entry_y
+
+exit_x, exit_y = cfg["exit"]
+exit_point: tuple[int, int] = exit_x, exit_y
 
 
 def hex_parser(cell: Cell) -> str:
@@ -29,10 +36,6 @@ def write_hex_to_a_file() -> None:
     rng = seed_generator("salmonella")
     grid = cell_generator(cfg["width"], cfg["height"])
     generate_maze(0, 0, grid, rng)
-    # for row in grid:
-    #     for cell in row:
-    #         print(hex_parser(cell), end="")
-    #     print()
     with open(cfg["output_file"], "w") as f:
         for row in grid:
             line = ""
@@ -42,7 +45,7 @@ def write_hex_to_a_file() -> None:
         f.write("\n")
         f.write(f"{cfg["entry"][0]},{cfg["entry"][1]}\n")
         f.write(f"{cfg["exit"][0]},{cfg["exit"][1]}\n")
-        # f.write(shortest_path) ## needs to be coded first.
+        f.write(f"{maze_solver(grid, entry_point, exit_point)}")
         
 
 if __name__ == "__main__":
