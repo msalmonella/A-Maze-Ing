@@ -1,2 +1,22 @@
-==============================================================
+------ FINISHED ------
+
+
 Random seed generator (use whatever hell I want) It must be reproducable so I have to use an algorithm instead of something actual random!
+
+
+------ FINISHED ------
+
+
+
+------ WORK IN PROGRESS ------
+
++ a "queue" list that takes cell's waiting to be explored
+
++ a "visited" `set` that takes cell that are already seen so don't visit again
+
++ a "came_from" dictionary that takes current cell as "key" and
+		where I came from as it's value.
+
+came from remains
+
+------ WORK IN PROGRESS ------
