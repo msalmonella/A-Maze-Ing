@@ -8,7 +8,7 @@ Random seed generator (use whatever hell I want) It must be reproducable so I ha
 
 
 
------- WORK IN PROGRESS ------
+------ FINISHED ------ BFS ------ FINISHED ------
 
 + a "queue" list that takes cell's waiting to be explored
 
@@ -17,6 +17,11 @@ Random seed generator (use whatever hell I want) It must be reproducable so I ha
 + a "came_from" dictionary that takes current cell as "key" and
 		where I came from as it's value.
 
-came from remains
+------ FINISHED ------ BFS ------ FINISHED ------
 
------- WORK IN PROGRESS ------
+				:TASKS TO GO BACK AND REMEMBER:
+
+1. !! CLEANUP THE CODE BASE!!! Everything runs in solver as of 30 June !!
+	== get rid of cfg[] objects that comes from config parser and make it cleaner ==
+
+2. NESW conversion PDF requirement.
