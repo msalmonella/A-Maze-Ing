@@ -4,22 +4,26 @@ from cell import cell_generator
 from maze_generation import generate_maze
 
 cfg = parse_config("config.txt")
-queue: list[tuple] = []
-visited: set = set() 
-came_from: dict = {}
 
 rng = seed_generator("salmonella")
 grid = cell_generator(cfg["width"], cfg["height"])
 generate_maze(0, 0, grid, rng)
 
 
-def qvc_appender(current_pos, queue_pos: tuple) -> None:
-    queue.append(queue_pos)
-    visited.add(current_pos)
-
 
 def maze_solver(maze, entry_point, exit_point) -> None:
     x, y = entry_point
+    queue: list[tuple] = [entry_point]
+    visited: set = {entry_point}
+    came_from: dict = {entry_point: None}
+
+    def qvc_appender(current_pos, queue_pos: tuple) -> None:
+        queue.append(queue_pos)
+        visited.add(queue_pos)
+        came_from[queue_pos] = current_pos
+
+    # while loop that mazes the maze and does the conditions below
+
     if maze[y][x].north == False:
         qvc_appender((x, y), (x, y - 1))
     if maze[y][x].south == False:
