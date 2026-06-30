@@ -3,13 +3,6 @@ from seeder import seed_generator
 from cell import cell_generator
 from maze_generation import generate_maze
 
-cfg = parse_config("config.txt")
-
-rng = seed_generator("salmonella")
-grid = cell_generator(cfg["width"], cfg["height"])
-generate_maze(0, 0, grid, rng)
-
-
 
 """ BFS """
 def maze_solver(maze, entry_point, exit_point) -> list[tuple[int, int]]:
@@ -47,6 +40,25 @@ def maze_solver(maze, entry_point, exit_point) -> list[tuple[int, int]]:
     return path
 
 
-if __name__ == "__main__":
-    
-    print(maze_solver(grid, cfg["entry"], cfg["exit"]))
+def nesw_conversion(path: list[tuple[int, int]]) -> list[str]:
+    nesw: list[str] = []
+    for i in range(len(path) - 1):
+        current = path[i]
+        next_cell = path[i + 1]
+
+        current_x, current_y = current
+        next_x, next_y = next_cell
+
+        if next_y > current_y:
+            nesw.append("N")
+
+        if next_x > current_x:
+            nesw.append("E")
+
+        if current_y > next_y:
+            nesw.append("S")
+
+        if current_x > next_x:
+            nesw.append("W")
+
+    return nesw
