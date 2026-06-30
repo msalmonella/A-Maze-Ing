@@ -1,14 +1,14 @@
------- FINISHED ------
+						------ FINISHED ------
 
 
 Random seed generator (use whatever hell I want) It must be reproducable so I have to use an algorithm instead of something actual random!
 
 
------- FINISHED ------
+						------ FINISHED ------
 
 
 
------- FINISHED ------ BFS ------ FINISHED ------
+			------ FINISHED ------ BFS ------ FINISHED ------
 
 + a "queue" list that takes cell's waiting to be explored
 
@@ -17,11 +17,15 @@ Random seed generator (use whatever hell I want) It must be reproducable so I ha
 + a "came_from" dictionary that takes current cell as "key" and
 		where I came from as it's value.
 
------- FINISHED ------ BFS ------ FINISHED ------
+			------ FINISHED ------ BFS ------ FINISHED ------
 
 				:TASKS TO GO BACK AND REMEMBER:
+
+						------ FINISHED ------
 
 1. !! CLEANUP THE CODE BASE!!! Everything runs in solver as of 30 June !!
 	== get rid of cfg[] objects that comes from config parser and make it cleaner ==
 
 2. NESW conversion PDF requirement.
+
+						------ FINISHED ------
