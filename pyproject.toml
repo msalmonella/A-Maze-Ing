@@ -5,8 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "mazegen-hermanos"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+description = "Maze generator implementation for the project a_maze_ing."
+authors = [
+    { name = "Cahit Atilla Bozkurt" },
+    { name = "Ahmet Yasin Dede", email = "ahmetyasindd@gmail.com" }
+]
+readme = "mazegen/_README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mlx>=0.32.0",
