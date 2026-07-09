@@ -18,4 +18,17 @@ debug:
 clean:
 	@rm --force --recursive __pycache__ mypy_cache
 
-.PHONY: install run debug clean
+lint:
+	@uv run flake8 .
+	@uv run mypy . \
+	--warn-return-any \
+	--warn-unused-ignores \
+	--ignore-missing-imports \
+	--disallow-untyped-defs \
+	--check-untyped-defs
+
+lint-strict:
+	@uv run flake8 .
+	@uv run mypy --strict
+
+.PHONY: install run debug clean lint lint-strict
