@@ -5,6 +5,12 @@ MAIN	=	${NAME}.py
 
 SRC		=	${MAIN} ./maze
 
+# RUN THIS BEFORE FINISHING THE PROJECT
+.build:
+	@uv build --wheel
+	@mv dist/*.whl .
+	@rm --recursive --force dist
+
 install:
 	@uv sync
 # 	${PYTHON} -m venv ${VENV}
@@ -33,4 +39,4 @@ lint-strict:
 	@-uv run flake8 ${SRC}
 	@uv run mypy ${SRC} --strict
 
-.PHONY: install run debug clean lint lint-strict
+.PHONY: install run debug clean lint lint-strict .build

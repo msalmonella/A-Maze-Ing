@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 
-from maze import (
+from mazegen import (
     parse_config,
     cell_generator,
     seed_generator,
     generate_maze,
     maze_solver,
 )
-from maze.solver import nesw_conversion
+from mazegen.solver import nesw_conversion
 
 # import mlx
 

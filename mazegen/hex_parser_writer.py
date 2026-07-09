@@ -1,4 +1,4 @@
-from maze import (
+from . import (
     parse_config,
     cell_generator,
     seed_generator,

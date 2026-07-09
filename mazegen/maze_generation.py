@@ -1,4 +1,4 @@
-from maze import parse_config
+from . import parse_config
 
 cfg = parse_config("config.txt")
 
