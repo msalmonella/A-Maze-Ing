@@ -2,3 +2,8 @@ notes.txt
 maze.txt
 __pycache__
 .python-version
+
+# Package managers
+.venv
+uv.lock
+poetry.lock
