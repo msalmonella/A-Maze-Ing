@@ -1,26 +1,30 @@
-from config_parser import parse_config
+from maze import parse_config
 
 cfg = parse_config("config.txt")
 
-"""Digging into walls"""
-def mazer_the_miner(maze: list, next_pos: tuple, prev_pos: tuple, direction: str) -> None:
+
+def mazer_the_miner(
+    maze: list, next_pos: tuple, prev_pos: tuple, direction: str
+) -> None:
+    """Digging into walls"""
     next_x, next_y = next_pos
     x, y = prev_pos
-    if (direction == "N"):
+    if direction == "N":
         maze[y][x].north = False
         maze[next_y][next_x].south = False
-    elif (direction == "S"):
+    elif direction == "S":
         maze[y][x].south = False
         maze[next_y][next_x].north = False
-    elif (direction == "E"):
+    elif direction == "E":
         maze[y][x].east = False
         maze[next_y][next_x].west = False
-    elif (direction == "W"):
+    elif direction == "W":
         maze[y][x].west = False
         maze[next_y][next_x].east = False
 
-"""Recursive function to create maze"""
+
 def generate_maze(x: int, y: int, maze: list, rng) -> None:
+    """Recursive function to create maze"""
     maze[y][x].visited = True
     directions = ["N", "E", "S", "W"]
     rng.shuffle(directions)
@@ -34,6 +38,10 @@ def generate_maze(x: int, y: int, maze: list, rng) -> None:
             next_x, next_y = x + 1, y
         elif choice == "W":
             next_x, next_y = x - 1, y
-        if 0 <= next_x < cfg["width"] and 0 <= next_y < cfg["height"] and not maze[next_y][next_x].visited:
+        if (
+            0 <= next_x < cfg["width"]
+            and 0 <= next_y < cfg["height"]
+            and not maze[next_y][next_x].visited
+        ):
             mazer_the_miner(maze, (next_x, next_y), (x, y), choice)
             generate_maze(next_x, next_y, maze, rng)

@@ -1,10 +1,14 @@
 #! /usr/bin/env python3
 
-from config_parser import parse_config
-from maze_generation import generate_maze
-from cell import cell_generator
-from seeder import seed_generator
-from solver import maze_solver, nesw_conversion
+from maze import (
+    parse_config,
+    cell_generator,
+    seed_generator,
+    generate_maze,
+    maze_solver,
+)
+from maze.solver import nesw_conversion
+
 # import mlx
 
 cfg = parse_config("config.txt")

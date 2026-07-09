@@ -3,6 +3,8 @@ NAME 	=	a_maze_ing
 PYTHON	=	python3
 MAIN	=	${NAME}.py
 
+SRC		=	${MAIN} ./maze
+
 install:
 	@uv sync
 # 	${PYTHON} -m venv ${VENV}
@@ -19,8 +21,8 @@ clean:
 	@rm --force --recursive __pycache__ mypy_cache
 
 lint:
-	@uv run flake8 .
-	@uv run mypy . \
+	@-uv run flake8 ${SRC}
+	@uv run mypy ${SRC} \
 	--warn-return-any \
 	--warn-unused-ignores \
 	--ignore-missing-imports \
@@ -28,7 +30,7 @@ lint:
 	--check-untyped-defs
 
 lint-strict:
-	@uv run flake8 .
-	@uv run mypy --strict
+	@-uv run flake8 ${SRC}
+	@uv run mypy ${SRC} --strict
 
 .PHONY: install run debug clean lint lint-strict

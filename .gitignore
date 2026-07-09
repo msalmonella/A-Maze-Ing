@@ -1,7 +1,10 @@
 notes.txt
 maze.txt
-__pycache__
 .python-version
+
+# Caches
+__pycache__
+.mypy_cache
 
 # Package managers
 .venv

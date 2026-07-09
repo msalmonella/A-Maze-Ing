@@ -1,11 +1,5 @@
-from config_parser import parse_config
-from seeder import seed_generator
-from cell import cell_generator
-from maze_generation import generate_maze
-
-
-""" BFS """
 def maze_solver(maze, entry_point, exit_point) -> list[tuple[int, int]]:
+    """BFS"""
     path: list = []
     node = exit_point
     queue: list[tuple] = [entry_point]

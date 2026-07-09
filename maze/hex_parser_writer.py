@@ -1,8 +1,11 @@
-from seeder import seed_generator
-from cell import Cell, cell_generator
-from maze_generation import generate_maze
-from config_parser import parse_config
-from solver import maze_solver
+from maze import (
+    parse_config,
+    cell_generator,
+    seed_generator,
+    generate_maze,
+    maze_solver,
+)
+from .cell import Cell
 
 cfg = parse_config("config.txt")
 
@@ -14,22 +17,22 @@ exit_point: tuple[int, int] = exit_x, exit_y
 
 
 def hex_parser(cell: Cell) -> str:
-    HEX_MAP_CHARS:str = "0123456789ABCDEF"
+    HEX_MAP_CHARS: str = "0123456789ABCDEF"
     hex_val: int = 0
     n_val: int = 0
     e_val: int = 0
     s_val: int = 0
     w_val: int = 0
-    if (cell.north == True):
+    if cell.north == True:
         n_val = 1
-    if (cell.east == True):
+    if cell.east == True:
         e_val = 1
-    if (cell.south == True):
+    if cell.south == True:
         s_val = 1
-    if (cell.west == True):
+    if cell.west == True:
         w_val = 1
     hex_val = n_val * 1 + e_val * 2 + s_val * 4 + w_val * 8
-    return (HEX_MAP_CHARS[hex_val])
+    return HEX_MAP_CHARS[hex_val]
 
 
 def write_hex_to_a_file() -> None:
@@ -46,7 +49,7 @@ def write_hex_to_a_file() -> None:
         f.write(f"{cfg["entry"][0]},{cfg["entry"][1]}\n")
         f.write(f"{cfg["exit"][0]},{cfg["exit"][1]}\n")
         f.write(f"{maze_solver(grid, entry_point, exit_point)}")
-        
+
 
 if __name__ == "__main__":
     write_hex_to_a_file()
