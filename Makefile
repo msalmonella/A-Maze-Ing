@@ -18,7 +18,7 @@ debug:
 	@uv run ${PYTHON} -m pdb ${MAIN}
 
 clean:
-	@rm --force --recursive __pycache__ mypy_cache
+	@find . -type d \( -name "__pycache__" -o -name ".mypy_cache" \) -exec rm -rf {} +
 
 lint:
 	@-uv run flake8 ${SRC}
