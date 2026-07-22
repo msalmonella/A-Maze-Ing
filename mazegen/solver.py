@@ -1,10 +1,16 @@
-def maze_solver(maze, entry_point, exit_point) -> list[tuple[int, int]]:
+from .generator import MazeGenerator
+
+
+def maze_solver(
+    maze_gen: MazeGenerator, entry_point, exit_point
+) -> list[tuple[int, int]]:
     """BFS"""
     path: list = []
     node = exit_point
     queue: list[tuple] = [entry_point]
     visited: set = {entry_point}
     came_from: dict = {entry_point: None}
+    maze = maze_gen.maze
 
     def qvc_appender(current_pos, queue_pos: tuple) -> None:
         if queue_pos not in visited:

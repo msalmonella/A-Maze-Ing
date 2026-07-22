@@ -1,19 +1,6 @@
-from . import (
-    parse_config,
-    cell_generator,
-    seed_generator,
-    generate_maze,
-    maze_solver,
-)
-from .cell import Cell
-
-cfg = parse_config("config.txt")
-
-entry_x, entry_y = cfg["entry"]
-entry_point: tuple[int, int] = entry_x, entry_y
-
-exit_x, exit_y = cfg["exit"]
-exit_point: tuple[int, int] = exit_x, exit_y
+from mazegen import MazeGenerator, maze_solver
+from .solver import nesw_conversion
+from .generator.cell import Cell
 
 
 def hex_parser(cell: Cell) -> str:
@@ -36,19 +23,28 @@ def hex_parser(cell: Cell) -> str:
 
 
 def write_hex_to_a_file() -> None:
-    rng = seed_generator("salmonella")
-    grid = cell_generator(cfg["width"], cfg["height"])
-    generate_maze(0, 0, grid, rng)
-    with open(cfg["output_file"], "w") as f:
-        for row in grid:
+    maze = MazeGenerator()
+    maze.generate_maze(0, 0, "salmonella")
+
+    entry_x, entry_y = maze.entry
+    entry_point: tuple[int, int] = entry_x, entry_y
+
+    exit_x, exit_y = maze.exit
+    exit_point: tuple[int, int] = exit_x, exit_y
+
+    with open(maze.output_file, "w") as f:
+        print(maze.output_file)
+        for row in maze.maze:
             line = ""
             for cell in row:
                 line += hex_parser(cell)
             f.write(line + "\n")
         f.write("\n")
-        f.write(f"{cfg["entry"][0]},{cfg["entry"][1]}\n")
-        f.write(f"{cfg["exit"][0]},{cfg["exit"][1]}\n")
-        f.write(f"{maze_solver(grid, entry_point, exit_point)}")
+        f.write(f"{entry_x},{entry_y}\n")
+        f.write(f"{exit_x},{exit_y}\n")
+        f.write(
+            f"{"".join(nesw_conversion(maze_solver(maze, entry_point, exit_point)))}"
+        )
 
 
 if __name__ == "__main__":

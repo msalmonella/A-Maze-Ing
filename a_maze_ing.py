@@ -1,29 +1,21 @@
 #! /usr/bin/env python3
 
-from mazegen import (
-    parse_config,
-    cell_generator,
-    seed_generator,
-    generate_maze,
-    maze_solver,
-)
+from mazegen import MazeGenerator, maze_solver
 from mazegen.solver import nesw_conversion
 
-# import mlx
 
-cfg = parse_config("config.txt")
+def main() -> None:
+    maze = MazeGenerator()
+    maze.generate_maze(0, 0)
 
-rng = seed_generator("salmonella")
-grid = cell_generator(cfg["width"], cfg["height"])
-generate_maze(0, 0, grid, rng)
+    entry_point = maze.entry
+    exit_point = maze.exit
 
-if __name__ == "__main__":
-
-    # print(maze_solver(grid, cfg["entry"], cfg["exit"]))
-
-    entry_point = cfg["entry"]
-    exit_point = cfg["exit"]
-
-    path = maze_solver(grid, entry_point, exit_point)
+    path = maze_solver(maze, entry_point, exit_point)
     converted: list[str] = nesw_conversion(path)
     print("".join(converted))
+
+
+if __name__ == "__main__":
+    main()
+
