@@ -2,14 +2,13 @@ from .config_parser import parse_config
 from .cell import Cell, cell_generator
 from .seeder import seed_generator
 
-cfg = parse_config("config.txt")
-
 
 class MazeGenerator:
     maze: list[list[Cell]]
-    cfg = parse_config("config.txt")
 
-    def __init__(self):
+    def __init__(self, config_path: str):
+        cfg = parse_config(config_path)
+
         self.width = cfg["width"]
         self.height = cfg["height"]
         self.entry = cfg["entry"]

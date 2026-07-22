@@ -34,6 +34,7 @@ NAME 	=	a_maze_ing
 
 PYTHON	=	python3
 MAIN	=	${NAME}.py
+CONFIG	=	config.txt
 
 SRC		=	${MAIN} ./mazegen
 
@@ -52,11 +53,11 @@ install:
 # 	pip install -r requirements.txt
 
 run:
-	@uv run ${PYTHON} ${MAIN}
+	@uv run ${PYTHON} ${MAIN} ${CONFIG}
 
 debug:
 	@printf "${INVERSE}${YELLOW}Running in DEBUG mode${RESET}\n"
-	@uv run ${PYTHON} -m pdb ${MAIN}
+	@uv run ${PYTHON} -m pdb ${MAIN} ${CONFIG}
 
 clean:
 	@printf "${YELLOW}Cleaning artifacts${RESET}\n"

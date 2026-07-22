@@ -23,7 +23,7 @@ def hex_parser(cell: Cell) -> str:
 
 
 def write_hex_to_a_file() -> None:
-    maze = MazeGenerator()
+    maze = MazeGenerator("config.txt")
     maze.generate_maze(0, 0, "salmonella")
 
     entry_x, entry_y = maze.entry

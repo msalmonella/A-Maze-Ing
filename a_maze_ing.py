@@ -1,11 +1,12 @@
 #! /usr/bin/env python3
 
+from sys import argv
 from mazegen import MazeGenerator, maze_solver
 from mazegen.solver import nesw_conversion
 
 
 def main() -> None:
-    maze = MazeGenerator()
+    maze = MazeGenerator(argv[1])
     maze.generate_maze(0, 0)
 
     entry_point = maze.entry
@@ -18,4 +19,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
