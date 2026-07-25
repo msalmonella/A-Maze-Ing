@@ -40,24 +40,3 @@ class Cell:
             | (Cell.Direction.SOUTH if self.south.closed else 0)
             | (Cell.Direction.WEST if self.west.closed else 0)
         )
-
-
-def generate_grid(width: int, height: int) -> list[list[Cell]]:
-    """Generate the initial maze grid with shared closed walls."""
-    grid: list[list[Cell]] = []
-
-    for row in range(height):
-        grid.append([])
-
-        for column in range(width):
-            above = grid[row - 1][column] if row else None
-            before = grid[row][column - 1] if column else None
-
-            grid[row].append(
-                Cell(
-                    north=above.south if above else None,
-                    west=before.east if before else None,
-                )
-            )
-
-    return grid

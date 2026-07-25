@@ -1,10 +1,12 @@
 from .config_parser import parse_config
-from .cell import Cell, cell_generator
+from .cell import Cell
 from .seeder import seed_generator
+
+Grid = list[list[Cell]]
 
 
 class MazeGenerator:
-    maze: list[list[Cell]]
+    grid: Grid
 
     def __init__(self, config_path: str):
         cfg = parse_config(config_path)
@@ -16,7 +18,7 @@ class MazeGenerator:
         self.output_file = cfg["output_file"]
         self.perfect = cfg["perfect"]
 
-        self.maze = cell_generator(self.width, self.height)
+        self.grid = self._generate_grid()
 
     def _mazer_the_miner(
         self, next_pos: tuple, prev_pos: tuple, direction: str
@@ -60,3 +62,23 @@ class MazeGenerator:
             ):
                 self._mazer_the_miner((next_x, next_y), (x, y), choice)
                 self.generate_maze(next_x, next_y, seed)
+
+    def _generate_grid(self) -> Grid:
+        """Generate the initial maze grid with shared closed walls."""
+        grid: Grid = []
+
+        for row in range(self.height):
+            grid.append([])
+
+            for column in range(self.width):
+                above = grid[row - 1][column] if row else None
+                before = grid[row][column - 1] if column else None
+
+                grid[row].append(
+                    Cell(
+                        north=above.south if above else None,
+                        west=before.east if before else None,
+                    )
+                )
+
+        return grid
