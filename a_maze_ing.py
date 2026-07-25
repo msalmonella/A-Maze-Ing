@@ -6,7 +6,7 @@ from mazegen import MazeGenerator, write_hex_to_a_file
 
 def main() -> None:
     maze = MazeGenerator(argv[1])
-    maze.generate_maze(0, 0, "salmonella")
+    maze.generate_maze(seed="salmonella")
     write_hex_to_a_file(maze)
 
 

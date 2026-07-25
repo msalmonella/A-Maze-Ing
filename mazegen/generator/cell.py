@@ -1,6 +1,15 @@
 from enum import IntEnum
 
 
+class Direction(IntEnum):
+    """Binary counterparts of closed walls."""
+
+    NORTH = 0b0001
+    EAST = 0b0010
+    SOUTH = 0b0100
+    WEST = 0b1000
+
+
 class Wall:
     """Represents a wall and it's closed state."""
 
@@ -23,20 +32,12 @@ class Cell:
         self.south = south if south is not None else Wall()
         self.west = west if west is not None else Wall()
 
-    class Direction(IntEnum):
-        """Binary counterparts of closed walls."""
-
-        NORTH = 0b0001
-        EAST = 0b0010
-        SOUTH = 0b0100
-        WEST = 0b1000
-
     @property
     def value(self) -> int:
         """Returns the integer representation of neighboring walls' states."""
         return (
-            (Cell.Direction.NORTH if self.north.closed else 0)
-            | (Cell.Direction.EAST if self.east.closed else 0)
-            | (Cell.Direction.SOUTH if self.south.closed else 0)
-            | (Cell.Direction.WEST if self.west.closed else 0)
+            (Direction.NORTH if self.north.closed else 0)
+            | (Direction.EAST if self.east.closed else 0)
+            | (Direction.SOUTH if self.south.closed else 0)
+            | (Direction.WEST if self.west.closed else 0)
         )

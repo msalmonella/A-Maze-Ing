@@ -1,8 +1,14 @@
+from typing import NamedTuple
 from .config_parser import parse_config
-from .cell import Cell
+from .cell import Direction, Wall, Cell
 from .seeder import seed_generator
 
 Grid = list[list[Cell]]
+
+
+class GridIndex(NamedTuple):
+    row: int
+    column: int
 
 
 class MazeGenerator:
@@ -21,47 +27,56 @@ class MazeGenerator:
         self.grid = self._generate_grid()
 
     def _mazer_the_miner(
-        self, next_pos: tuple, prev_pos: tuple, direction: str
+        self,
+        head: GridIndex = GridIndex(0, 0),
+        processed: set[GridIndex] = set(),
+        seed: str = "",
     ) -> None:
-        """Digging into walls"""
-        next_x, next_y = next_pos
-        x, y = prev_pos
-        if direction == "N":
-            self.maze[y][x].north = False
-            self.maze[next_y][next_x].south = False
-        elif direction == "S":
-            self.maze[y][x].south = False
-            self.maze[next_y][next_x].north = False
-        elif direction == "E":
-            self.maze[y][x].east = False
-            self.maze[next_y][next_x].west = False
-        elif direction == "W":
-            self.maze[y][x].west = False
-            self.maze[next_y][next_x].east = False
-
-    def generate_maze(self, x: int, y: int, seed: str = "") -> None:
-        """Recursive function to create maze"""
-        self.maze[y][x].visited = True
-        directions = ["N", "E", "S", "W"]
+        """Recursive function to create maze by digging into walls"""
+        processed.add(head)
         rng = seed_generator(seed)
+        directions = [d.value for d in Direction]
+
         rng.shuffle(directions)
-        for choice in directions:
-            next_x, next_y = x, y
-            if choice == "N":
-                next_x, next_y = x, y - 1
-            elif choice == "S":
-                next_x, next_y = x, y + 1
-            elif choice == "E":
-                next_x, next_y = x + 1, y
-            elif choice == "W":
-                next_x, next_y = x - 1, y
+        for direction in directions:
+            next_index: GridIndex
+            match direction:
+                case Direction.NORTH:
+                    next_index = GridIndex(head.row - 1, head.column)
+                case Direction.EAST:
+                    next_index = GridIndex(head.row, head.column + 1)
+                case Direction.SOUTH:
+                    next_index = GridIndex(head.row + 1, head.column)
+                case Direction.WEST:
+                    next_index = GridIndex(head.row, head.column - 1)
+                case _:
+                    raise Exception
+
             if (
-                0 <= next_x < self.width
-                and 0 <= next_y < self.height
-                and not self.maze[next_y][next_x].visited
+                0 <= next_index.column < self.width
+                and 0 <= next_index.row < self.height
+                and not next_index in processed
             ):
-                self._mazer_the_miner((next_x, next_y), (x, y), choice)
-                self.generate_maze(next_x, next_y, seed)
+                row, column = head
+
+                wall: Wall
+                match direction:
+                    case Direction.NORTH:
+                        wall = self.grid[row][column].north
+                    case Direction.EAST:
+                        wall = self.grid[row][column].east
+                    case Direction.SOUTH:
+                        wall = self.grid[row][column].south
+                    case Direction.WEST:
+                        wall = self.grid[row][column].west
+                    case _:
+                        raise Exception
+                wall.closed = False
+
+                self._mazer_the_miner(next_index, processed, seed)
+
+    def generate_maze(self, seed: str = "") -> None:
+        self._mazer_the_miner(seed=seed)
 
     def _generate_grid(self) -> Grid:
         """Generate the initial maze grid with shared closed walls."""
