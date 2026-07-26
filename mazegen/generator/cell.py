@@ -1,13 +1,4 @@
-from enum import IntEnum
-
-
-class Direction(IntEnum):
-    """Binary counterparts of closed walls."""
-
-    NORTH = 0b0001
-    EAST = 0b0010
-    SOUTH = 0b0100
-    WEST = 0b1000
+from .models import Direction
 
 
 class Wall:

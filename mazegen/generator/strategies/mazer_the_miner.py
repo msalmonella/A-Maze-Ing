@@ -1,13 +1,8 @@
-from typing import NamedTuple
 import mazegen
 from ._base import Strategy
-from ..cell import Direction, Wall
+from ..cell import Wall
+from ..models import GridIndex, Direction
 from ..seeder import seed_generator
-
-
-class GridIndex(NamedTuple):
-    row: int
-    column: int
 
 
 class MazerTheMiner(Strategy):
