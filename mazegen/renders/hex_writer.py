@@ -1,12 +1,10 @@
 import mazegen
 from . import Renderer
-from ..generator.models import GridIndex
+from ..generator.models import Path
 
 
 class HexWriter(Renderer):
-    def __call__(
-        self, maze: mazegen.MazeGenerator, solution: list[GridIndex]
-    ) -> None:
+    def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
         entry_x, entry_y = maze.entry
         exit_x, exit_y = maze.exit
 
@@ -23,7 +21,7 @@ class HexWriter(Renderer):
             f.write(f"{exit_x},{exit_y}\n")
             f.write(f"{"".join(self._nesw_conversion(solution))}")
 
-    def _nesw_conversion(self, path: list[GridIndex]) -> list[str]:
+    def _nesw_conversion(self, path: Path) -> list[str]:
         nesw: list[str] = []
         for i in range(len(path) - 1):
             current = path[i]

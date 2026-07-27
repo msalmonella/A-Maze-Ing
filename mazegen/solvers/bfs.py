@@ -1,15 +1,15 @@
 import mazegen
 from . import Solver
-from ..generator.models import GridIndex
+from ..generator.models import GridIndex, Path
 
 
 class BFS(Solver):
     """BFS"""
 
-    def __call__(self, maze: mazegen.MazeGenerator) -> list[GridIndex]:
-        path: list[GridIndex] = []
+    def __call__(self, maze: mazegen.MazeGenerator) -> Path:
+        path: Path = []
         node: GridIndex = maze.exit
-        queue: list[GridIndex] = [maze.entry]
+        queue: Path = [maze.entry]
         visited: set = {maze.entry}
         came_from: dict = {maze.entry: None}
         grid = maze.grid

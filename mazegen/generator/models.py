@@ -16,3 +16,6 @@ class GridIndex(NamedTuple):
 
     row: int
     column: int
+
+
+Path = list[GridIndex]
