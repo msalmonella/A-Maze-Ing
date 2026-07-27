@@ -1,5 +1,5 @@
 import mazegen
-from ._base import Strategy
+from . import Strategy
 from ..cell import Wall
 from ..models import GridIndex, Direction
 from ..seeder import seed_generator
