@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field, field_validator, ValidationError
 from ..generator.generators import Generator, MazerTheMiner
 from ..solvers import Solver, BFS
-from ..renders import Renderer, HexWriter
+from ..renderers import Renderer, HexWriter
 from ..generator import generators
-from .. import solvers, renders
+from .. import solvers, renderers
 
 
 def parse_config(filepath: str) -> Config:
@@ -70,9 +70,9 @@ class Config(BaseModel):
     @classmethod
     def _str_to_renderer(cls, value: str | Renderer) -> Renderer:
         if isinstance(value, str):
-            if not hasattr(renders, value):
+            if not hasattr(renderers, value):
                 raise AttributeError("No such renderer :()")
-            return getattr(renders, value)
+            return getattr(renderers, value)
         return value
 
 
