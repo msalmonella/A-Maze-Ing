@@ -19,7 +19,7 @@ class MazeGenerator:
         self.perfect = cfg.perfect
 
         self.seed = cfg.seed
-        self.strategy = cfg.strategy()
+        self.generator = cfg.generator()
         self.solver = cfg.solver()
         self.renderer = cfg.renderer()
 
@@ -32,7 +32,7 @@ class MazeGenerator:
         return self.solver(self)
 
     def generate(self, seed: str = "") -> None:
-        self.strategy(self, seed=seed)
+        self.generator(self, seed=seed)
 
     def _generate_grid(self) -> Grid:
         """Generate the initial maze grid with shared closed walls."""

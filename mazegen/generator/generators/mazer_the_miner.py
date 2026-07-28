@@ -1,11 +1,11 @@
 import mazegen
-from . import Strategy
+from . import Generator
 from ..cell import Wall
 from ..models import GridIndex, Direction
 from ..seeder import seed_generator
 
 
-class MazerTheMiner(Strategy):
+class MazerTheMiner(Generator):
 
     def __call__(self, maze: mazegen.MazeGenerator, seed: str = "") -> None:
         self.mazer_the_miner(maze, seed)

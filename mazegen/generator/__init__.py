@@ -1,4 +1,4 @@
 from .maze_generator import MazeGenerator
-from . import strategies
+from . import generators
 
-__all__ = ["MazeGenerator", "strategies"]
+__all__ = ["MazeGenerator", "generators"]

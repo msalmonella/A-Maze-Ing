@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field, field_validator, ValidationError
-from ..generator.strategies import Strategy, MazerTheMiner
+from ..generator.generators import Generator, MazerTheMiner
 from ..solvers import Solver, BFS
 from ..renders import Renderer, HexWriter
-from ..generator import strategies
+from ..generator import generators
 from .. import solvers, renders
 
 
@@ -32,7 +32,7 @@ class Config(BaseModel):
     perfect: bool
 
     seed: str = Field(default="")
-    strategy: type[Strategy] = Field(default=MazerTheMiner)
+    generator: type[Generator] = Field(default=MazerTheMiner)
     solver: type[Solver] = Field(default=BFS)
     renderer: type[Renderer] = Field(default=HexWriter)
 
@@ -48,13 +48,13 @@ class Config(BaseModel):
                 )
         return value
 
-    @field_validator("strategy", mode="before")
+    @field_validator("generator", mode="before")
     @classmethod
-    def _str_to_strategy(cls, value: str | Strategy) -> Strategy:
+    def _str_to_generator(cls, value: str | Generator) -> Generator:
         if isinstance(value, str):
-            if not hasattr(strategies, value):
-                raise AttributeError("No such strategy :()")
-            return getattr(strategies, value)
+            if not hasattr(generators, value):
+                raise AttributeError("No such generator :()")
+            return getattr(generators, value)
         return value
 
     @field_validator("solver", mode="before")
