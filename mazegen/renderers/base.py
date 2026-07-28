@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import mazegen
-from ..generator.models import Path
+from ..models import Path
 
 
 class Renderer(ABC):

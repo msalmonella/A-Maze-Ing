@@ -1,6 +1,6 @@
 import mazegen
 from . import Renderer
-from ..generator.models import Path
+from ..models import Path
 
 
 class HexWriter(Renderer):

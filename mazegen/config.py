@@ -1,9 +1,8 @@
 from pydantic import BaseModel, Field, field_validator, ValidationError
-from ..generator.generators import Generator, MazerTheMiner
-from ..solvers import Solver, BFS
-from ..renderers import Renderer, HexWriter
-from ..generator import generators
-from .. import solvers, renderers
+from .generators import Generator, MazerTheMiner
+from .solvers import Solver, BFS
+from .renderers import Renderer, HexWriter
+from . import generators, solvers, renderers
 
 
 def parse_config(filepath: str) -> Config:

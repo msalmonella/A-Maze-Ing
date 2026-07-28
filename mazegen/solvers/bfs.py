@@ -1,6 +1,6 @@
 import mazegen
 from . import Solver
-from ..generator.models import GridIndex, Path
+from ..models import GridIndex, Path
 
 
 class BFS(Solver):
