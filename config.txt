@@ -1,7 +1,15 @@
 # Maze Config
+
+## Mandatory
 WIDTH=7
 HEIGHT=7
 ENTRY=0,0
 EXIT=3,3
 OUTPUT_FILE=maze.txt
 PERFECT=False
+
+## Optional
+#SEED=salmonella
+#STRATEGY=MazerTheMiner
+#SOLVER=BFS
+#RENDERER=HexWriter

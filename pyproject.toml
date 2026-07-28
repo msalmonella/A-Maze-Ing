@@ -14,6 +14,7 @@ readme = "mazegen/_README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mlx",
+    "pydantic>=2.13.4",
 ]
 
 [dependency-groups]

@@ -1,6 +1,6 @@
-from .config_parser import parse_config
+from .config import parse_config
 from .cell import Cell
-from .strategies import Strategy, MazerTheMiner
+from .models import Path
 
 Grid = list[list[Cell]]
 
@@ -11,19 +11,28 @@ class MazeGenerator:
     def __init__(self, config_path: str):
         cfg = parse_config(config_path)
 
-        self.width = cfg["width"]
-        self.height = cfg["height"]
-        self.entry = cfg["entry"]
-        self.exit = cfg["exit"]
-        self.output_file = cfg["output_file"]
-        self.perfect = cfg["perfect"]
+        self.width = cfg.width
+        self.height = cfg.height
+        self.entry = cfg.entry
+        self.exit = cfg.exit
+        self.output_file = cfg.output_file
+        self.perfect = cfg.perfect
+
+        self.seed = cfg.seed
+        self.strategy = cfg.strategy()
+        self.solver = cfg.solver()
+        self.renderer = cfg.renderer()
 
         self.grid = self._generate_grid()
 
-    def generate_maze(
-        self, strategy: Strategy = MazerTheMiner(), seed: str = ""
-    ) -> None:
-        strategy(self, seed=seed)
+    def render(self, solution: Path) -> None:
+        self.renderer(self, solution)
+
+    def solve(self) -> Path:
+        return self.solver(self)
+
+    def generate(self, seed: str = "") -> None:
+        self.strategy(self, seed=seed)
 
     def _generate_grid(self) -> Grid:
         """Generate the initial maze grid with shared closed walls."""
