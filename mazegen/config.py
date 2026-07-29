@@ -5,21 +5,6 @@ from .renderers import Renderer, HexWriter
 from . import generators, solvers, renderers
 
 
-def parse_config(filepath: str) -> Config:
-    """Parses the given config file"""
-
-    config: dict[str, str] = {}
-    with open(filepath) as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            key, value = line.split("=", 1)
-            config[key.strip().lower()] = value.strip()
-
-    return Config(**config)  # type: ignore
-
-
 class Config(BaseModel):
     """Handles validation for the maze attributes"""
 
@@ -73,6 +58,20 @@ class Config(BaseModel):
                 raise AttributeError("No such renderer :()")
             return getattr(renderers, value)
         return value
+
+def parse_config(filepath: str) -> Config:
+    """Parses the given config file"""
+
+    config: dict[str, str] = {}
+    with open(filepath) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            key, value = line.split("=", 1)
+            config[key.strip().lower()] = value.strip()
+
+    return Config(**config)  # type: ignore
 
 
 if __name__ == "__main__":
