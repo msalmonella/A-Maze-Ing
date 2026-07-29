@@ -1,4 +1,3 @@
-from .config import parse_config
 from .cell import Cell
 from .models import Path
 
@@ -9,6 +8,7 @@ class MazeGenerator:
     grid: Grid
 
     def __init__(self, config_path: str):
+        from .config import parse_config
         cfg = parse_config(config_path)
 
         self.width = cfg.width
