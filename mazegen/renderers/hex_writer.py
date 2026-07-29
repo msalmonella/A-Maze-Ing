@@ -13,7 +13,7 @@ class HexWriter(Renderer):
             for row in maze.grid:
                 line = ""
                 for cell in row:
-                    line += hex(cell.value)
+                    line += hex(cell.value)[2:]
                 f.write(line + "\n")
 
             f.write("\n")
