@@ -1,7 +1,7 @@
 import mazegen
 from . import Generator
 from ..cell import Wall
-from ..models import GridIndex, Direction
+from ..models import Coordinate, Direction
 from ..seeder import seed_generator
 
 
@@ -14,8 +14,8 @@ class MazerTheMiner(Generator):
         self,
         maze: mazegen.MazeGenerator,
         seed: str = "",
-        head: GridIndex = GridIndex(0, 0),
-        processed: set[GridIndex] = set(),
+        head: Coordinate = Coordinate(0, 0),
+        processed: set[Coordinate] = set(),
     ) -> None:
         """Recursive function to create maze by digging into walls"""
         processed.add(head)
@@ -24,36 +24,36 @@ class MazerTheMiner(Generator):
 
         rng.shuffle(directions)
         for direction in directions:
-            next_index: GridIndex
+            next_index: Coordinate
             match direction:
                 case Direction.NORTH:
-                    next_index = GridIndex(head.row - 1, head.column)
+                    next_index = Coordinate(head.x, head.y - 1)
                 case Direction.EAST:
-                    next_index = GridIndex(head.row, head.column + 1)
+                    next_index = Coordinate(head.x + 1, head.y)
                 case Direction.SOUTH:
-                    next_index = GridIndex(head.row + 1, head.column)
+                    next_index = Coordinate(head.x, head.y + 1)
                 case Direction.WEST:
-                    next_index = GridIndex(head.row, head.column - 1)
+                    next_index = Coordinate(head.x - 1, head.y)
                 case _:
                     raise Exception
 
             if (
-                0 <= next_index.column < maze.width
-                and 0 <= next_index.row < maze.height
+                0 <= next_index.x < maze.width
+                and 0 <= next_index.y < maze.height
                 and not next_index in processed
             ):
-                row, column = head
+                x, y = head
 
                 wall: Wall
                 match direction:
                     case Direction.NORTH:
-                        wall = maze.grid[row][column].north
+                        wall = maze.grid[y][x].north
                     case Direction.EAST:
-                        wall = maze.grid[row][column].east
+                        wall = maze.grid[y][x].east
                     case Direction.SOUTH:
-                        wall = maze.grid[row][column].south
+                        wall = maze.grid[y][x].south
                     case Direction.WEST:
-                        wall = maze.grid[row][column].west
+                        wall = maze.grid[y][x].west
                     case _:
                         raise Exception
                 wall.closed = False

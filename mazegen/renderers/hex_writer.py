@@ -27,8 +27,8 @@ class HexWriter(Renderer):
             current = path[i]
             next_cell = path[i + 1]
 
-            current_y, current_x = current
-            next_y, next_x = next_cell
+            current_x, current_y = current
+            next_x, next_y = next_cell
 
             if next_y > current_y:
                 nesw.append("N")

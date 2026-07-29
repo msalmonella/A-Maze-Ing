@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, field_validator, ValidationError
+from .models import Coordinate
 from .generators import Generator, MazerTheMiner
 from .solvers import Solver, BFS
 from .renderers import Renderer, HexWriter
@@ -10,8 +11,8 @@ class Config(BaseModel):
 
     width: int = Field(ge=2)
     height: int = Field(ge=2)
-    entry: tuple[int, int]
-    exit: tuple[int, int]
+    entry: Coordinate
+    exit: Coordinate
     output_file: str = Field(min_length=1)
     perfect: bool
 
@@ -22,10 +23,11 @@ class Config(BaseModel):
 
     @field_validator("entry", "exit", mode="before")
     @classmethod
-    def _str_to_tuple(cls, value: str | tuple[int, int]) -> tuple[int, ...]:
+    def _str_to_coordinate(cls, value: str | Coordinate) -> Coordinate:
         if isinstance(value, str):
             try:
-                return tuple(map(int, value.split(",")))
+                x, y = value.split(",")
+                return Coordinate(int(x), int(y))
             except ValueError:
                 raise ValueError(
                     "Coordinates must be two comma-separated integers"
@@ -58,6 +60,7 @@ class Config(BaseModel):
                 raise AttributeError("No such renderer :()")
             return getattr(renderers, value)
         return value
+
 
 def parse_config(filepath: str) -> Config:
     """Parses the given config file"""

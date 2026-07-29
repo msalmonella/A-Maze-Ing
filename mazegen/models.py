@@ -11,11 +11,11 @@ class Direction(IntEnum):
     WEST = 0b1000
 
 
-class GridIndex(NamedTuple):
+class Coordinate(NamedTuple):
     """Indicates a position on a maze grid."""
 
-    row: int
-    column: int
+    x: int
+    y: int
 
 
-Path = list[GridIndex]
+Path = list[Coordinate]
