@@ -16,17 +16,16 @@ class Cell(StrEnum):
 
 def clear_space(maze: mazegen.MazeGenerator) -> None:
     """Responsible for clearing up the buffer"""
+    print("\033[H", end="")
     for _ in range(terminal_size.columns):
         for _ in range(terminal_size.lines):
             print(Cell.SPACE, end="")
+    print("\033[H", end="")
 
 
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
-
-        print("\033[H", end="")
         clear_space(maze)
-        print("\033[H", end="")
         for _ in range(maze.width):
             print(Cell.Wall.HORIZONTAL, end="")
         print("=", end="")
