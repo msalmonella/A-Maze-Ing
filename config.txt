@@ -1,8 +1,8 @@
 # Maze Config
 
 ## Mandatory
-WIDTH=7
-HEIGHT=7
+WIDTH=11
+HEIGHT=11
 ENTRY=0,0
 EXIT=3,3
 OUTPUT_FILE=maze.txt
