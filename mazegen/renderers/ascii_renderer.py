@@ -17,6 +17,16 @@ class Cell:
         self.width = width * 3 #for making the cell look prettier
         self.height = height
 
+    def corner_sprite(self) -> list[str]:
+        rows = []
+
+        rows.append(Glyph.EDGE + Glyph.H_WALL * self.width + Glyph.EDGE)
+
+        for _ in range(self.height):
+            rows.append(Glyph.V_WALL + Glyph.SPACE * self.width + Glyph.V_WALL)
+
+        return rows
+
     def sprite(self) -> list[str]:
         rows = []
 
@@ -29,6 +39,7 @@ class Cell:
 
         return rows
 
+
 def clear_space(maze: mazegen.MazeGenerator) -> None:
     """Responsible for clearing up the buffer"""
     print("\033[H", end="")
@@ -40,11 +51,14 @@ def clear_space(maze: mazegen.MazeGenerator) -> None:
 
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
-        # this is for testing purposes ===========
-        cell = Cell(1, 1)
+        cell = Cell(3, 3)
         clear_space(maze)
-        # this is for testing purposes ===========
-        for _ in range(maze.width):
-            for _ in cell.sprite():
-                print(_ * maze.height)
+        print(maze.width)
+        for x_value in range(maze.width):
+            if maze.height == 0:
+                for _ in cell.sprite():
+                    print(_ * maze.height)
+            else:
+                for _ in cell.corner_sprite():
+                    print(_ * maze.height)
 
