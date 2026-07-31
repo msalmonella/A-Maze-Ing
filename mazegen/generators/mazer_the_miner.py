@@ -8,21 +8,21 @@ from ..seeder import seed_generator
 class MazerTheMiner(Generator):
 
     def __call__(self, maze: mazegen.MazeGenerator, seed: str = "") -> None:
-        self.mazer_the_miner(maze, seed)
+        rng = seed_generator(seed)
+        self.mazer_the_miner(maze, rng, Coordinate(0, 0), set())
 
     def mazer_the_miner(
         self,
         maze: mazegen.MazeGenerator,
-        seed: str = "",
-        head: Coordinate = Coordinate(0, 0),
-        processed: set[Coordinate] = set(),
+        rng: random.Random,
+        head: Coordinate,
+        processed: set[Coordinate],
     ) -> None:
         """Recursive function to create maze by digging into walls"""
         processed.add(head)
-        rng = seed_generator(seed)
         directions = [d.value for d in Direction]
-
         rng.shuffle(directions)
+
         for direction in directions:
             next_index: Coordinate
             match direction:
@@ -40,7 +40,7 @@ class MazerTheMiner(Generator):
             if (
                 0 <= next_index.x < maze.width
                 and 0 <= next_index.y < maze.height
-                and not next_index in processed
+                and next_index not in processed
             ):
                 x, y = head
 
@@ -58,4 +58,4 @@ class MazerTheMiner(Generator):
                         raise Exception
                 wall.closed = False
 
-                self.mazer_the_miner(maze, seed, next_index, processed)
+                self.mazer_the_miner(maze, rng, next_index, processed)
