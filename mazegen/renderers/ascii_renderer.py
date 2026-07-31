@@ -14,7 +14,7 @@ class Glyph(StrEnum):
 
 class Cell:
     def __init__(self, width: int = 3, height: int = 3):
-        self.width = width * 2 #for making the cell look prettier
+        self.width = width * 3 #for making the cell look prettier
         self.height = height
 
     def sprite(self) -> list[str]:
@@ -43,22 +43,8 @@ class AsciiRenderer(Renderer):
         # this is for testing purposes ===========
         cell = Cell(1, 1)
         clear_space(maze)
-        for _ in cell.sprite():
-            print(_ * 2)
-        return
         # this is for testing purposes ===========
         for _ in range(maze.width):
-            print(Cell.H_WALL, end="")
-        print("=", end="")
-        print()
-        for y in maze.grid:
-            print(Cell.Wall.VERTICAL, end="")
-            for x in y:
-                print(Cell.SPACE, end="")
-                print(Cell.Wall.VERTICAL, end="")
-            print()
-            print("=", end="")
-            for x in y:
-                print(Cell.Wall.HORIZONTAL, end="")
-            print("")
+            for _ in cell.sprite():
+                print(_ * maze.height)
 
