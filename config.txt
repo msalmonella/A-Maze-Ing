@@ -3,7 +3,7 @@
 ## Mandatory
 WIDTH=11
 HEIGHT=11
-ENTRY=0,0
+ENTRY=10,10
 EXIT=3,3
 OUTPUT_FILE=maze.txt
 PERFECT=False
