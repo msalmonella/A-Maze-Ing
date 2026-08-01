@@ -3,6 +3,7 @@ from . import Generator
 from ..cell import Wall
 from ..models import Coordinate, Direction
 from ..seeder import seed_generator
+import random
 
 
 class MazerTheMiner(Generator):
