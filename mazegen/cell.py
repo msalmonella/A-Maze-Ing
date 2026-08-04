@@ -1,4 +1,5 @@
 from .models import Direction
+from .errors import LockedWallError
 
 
 class Wall:
@@ -18,14 +19,16 @@ class Wall:
         """Representation of the wall's closed state.
 
         Raises:
-            Exception: Changing the wall's `closed` state when it is locked.
+            LockedWallError: Changing the `closed` state of a locked wall.
         """
         return self._closed
 
     @closed.setter
     def closed(self, value: bool) -> None:
         if self.locked:
-            raise Exception
+            raise LockedWallError(
+                "Cannot change 'closed' state of a locked wall"
+            )
         self._closed = value
 
 

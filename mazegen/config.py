@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, field_validator, ValidationError
 from pydantic_core import PydanticCustomError
 from .models import Coordinate
+from .errors import ConfigError
 from .generators import Generator, MazerTheMiner
 from .solvers import Solver, BFS
 from .renderers import Renderer, HexWriter
@@ -81,16 +82,19 @@ class Config(BaseModel):
 def parse_config(filepath: str) -> Config:
     """Parses the given config file"""
 
-    config: dict[str, str] = {}
-    with open(filepath) as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            key, value = line.split("=", 1)
-            config[key.strip().lower()] = value.strip()
+    try:
+        config: dict[str, str] = {}
+        with open(filepath) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                key, value = line.split("=", 1)
+                config[key.strip().lower()] = value.strip()
 
-    return Config(**config)  # type: ignore
+        return Config(**config)  # type: ignore
+    except ValidationError as e:
+        raise ConfigError("Invalid maze configuration", e) from e
 
 
 if __name__ == "__main__":
@@ -100,9 +104,9 @@ if __name__ == "__main__":
         print("Testing config")
         print("-" * 40)
         print(parse_config("config.txt").model_dump())
-    except ValidationError as e:
-        for err in e.errors():
+    except ConfigError as e:
+        for err in e.validation.errors():
             msg = err.get("msg")
             loc = err.get("loc")
             locs = ", ".join([str(l) for l in loc])
-            print(f"{msg}: {locs}")
+            print(f"{locs}: {msg}")
