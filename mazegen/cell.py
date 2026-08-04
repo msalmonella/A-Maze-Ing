@@ -53,3 +53,10 @@ class Cell:
             | (Direction.SOUTH if self.south.closed else 0)
             | (Direction.WEST if self.west.closed else 0)
         )
+
+    def lock(self) -> None:
+        """Locks all of the walls without raising an error."""
+        for wall in [self.north, self.east, self.south, self.west]:
+            if not wall.locked:
+                wall.closed = True
+                wall.locked = True

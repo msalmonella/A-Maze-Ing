@@ -40,6 +40,34 @@ class MazeGenerator:
     def generate(self, seed: str = "") -> None:
         self.generator(self, seed=seed)
 
+    def _pattern_42(self, grid: Grid):
+        """Places permanent 42 pattern if fits into the grid"""
+
+        pattern = [
+            "X   XXX",
+            "X     X",
+            "XXX XXX",
+            "  X X  ",
+            "  X XXX",
+        ]
+        padding = 1
+
+        if (
+            self.height < len(pattern) + padding * 2
+            or self.width < len(pattern[0]) + padding * 2
+        ):
+            return grid
+
+        for y, line in enumerate(pattern):
+            offset_y = (self.height - len(pattern)) // 2
+            offset_x = (self.width - len(line)) // 2
+
+            for x, char in enumerate(line):
+                cell = grid[y + offset_y][x + offset_x]
+                if char == "X":
+                    cell.lock()
+        return grid
+
     def _generate_grid(self) -> Grid:
         """Generate the initial maze grid with shared closed walls."""
         grid: Grid = []
@@ -58,4 +86,4 @@ class MazeGenerator:
 
                 grid[row].append(Cell(north=wall_above, west=wall_before))
 
-        return grid
+        return self._pattern_42(grid)
