@@ -9,6 +9,7 @@ class MazeGenerator:
 
     def __init__(self, config_path: str):
         from .config import parse_config
+
         cfg = parse_config(config_path)
 
         self.width = cfg.width
@@ -24,6 +25,11 @@ class MazeGenerator:
         self.renderer = cfg.renderer()
 
         self.grid = self._generate_grid()
+
+    def __repr__(self) -> str:
+        return "\n".join(
+            " ".join(f"{cell.value:2}" for cell in row) for row in self.grid
+        )
 
     def render(self, solution: Path) -> None:
         self.renderer(self, solution)
@@ -42,14 +48,9 @@ class MazeGenerator:
             grid.append([])
 
             for column in range(self.width):
-                above = grid[row - 1][column] if row else None
-                before = grid[row][column - 1] if column else None
+                wall_above = grid[row - 1][column].south if row else None
+                wall_before = grid[row][column - 1].east if column else None
 
-                grid[row].append(
-                    Cell(
-                        north=above.south if above else None,
-                        west=before.east if before else None,
-                    )
-                )
+                grid[row].append(Cell(north=wall_above, west=wall_before))
 
         return grid
