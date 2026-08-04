@@ -8,7 +8,9 @@ class MazeError(Exception):
 class ConfigError(MazeError):
     """Invalid configuration."""
 
-    def __init__(self, message: str, validation: ValidationError):
+    def __init__(
+        self, message: str, validation: ValidationError | None = None
+    ):
         super().__init__(message)
         self.validation = validation
 

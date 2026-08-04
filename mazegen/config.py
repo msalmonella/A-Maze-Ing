@@ -93,8 +93,12 @@ def parse_config(filepath: str) -> Config:
                 config[key.strip().lower()] = value.strip()
 
         return Config(**config)  # type: ignore
+    except OSError as e:
+        raise ConfigError("Could not read the file") from e
     except ValidationError as e:
         raise ConfigError("Invalid maze configuration", e) from e
+    except ValueError as e:
+        raise ConfigError("Bad key/value format (expected 'key=value')") from e
 
 
 if __name__ == "__main__":
@@ -105,8 +109,11 @@ if __name__ == "__main__":
         print("-" * 40)
         print(parse_config("config.txt").model_dump())
     except ConfigError as e:
-        for err in e.validation.errors():
-            msg = err.get("msg")
-            loc = err.get("loc")
-            locs = ", ".join([str(l) for l in loc])
-            print(f"{locs}: {msg}")
+        print(e)
+        if e.validation:
+            print()
+            for err in e.validation.errors():
+                msg = err.get("msg")
+                loc = err.get("loc")
+                locs = ", ".join([str(l) for l in loc])
+                print(f"{locs}: {msg}")
