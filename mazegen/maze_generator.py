@@ -51,6 +51,11 @@ class MazeGenerator:
                 wall_above = grid[row - 1][column].south if row else None
                 wall_before = grid[row][column - 1].east if column else None
 
+                if wall_above:
+                    wall_above.locked = False
+                if wall_before:
+                    wall_before.locked = False
+
                 grid[row].append(Cell(north=wall_above, west=wall_before))
 
         return grid
