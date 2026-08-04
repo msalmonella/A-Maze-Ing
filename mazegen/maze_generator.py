@@ -40,7 +40,7 @@ class MazeGenerator:
     def generate(self, seed: str = "") -> None:
         self.generator(self, seed=seed)
 
-    def _pattern_42(self, grid: Grid):
+    def _pattern_42(self, grid: Grid) -> Grid:
         """Places permanent 42 pattern if fits into the grid"""
 
         pattern = [

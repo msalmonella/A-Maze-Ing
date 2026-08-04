@@ -1,3 +1,4 @@
+from typing import cast
 from pydantic import BaseModel, Field, field_validator, ValidationError
 from pydantic_core import PydanticCustomError
 from .models import Coordinate
@@ -41,7 +42,7 @@ class Config(BaseModel):
     def _str_to_generator(cls, method: str | Generator) -> Generator:
         if isinstance(method, str):
             try:
-                return getattr(generators, method)
+                return cast(Generator, getattr(generators, method))
             except AttributeError as e:
                 raise PydanticCustomError(
                     "generator",
@@ -55,7 +56,7 @@ class Config(BaseModel):
     def _str_to_solver(cls, method: str | Solver) -> Solver:
         if isinstance(method, str):
             try:
-                return getattr(solvers, method)
+                return cast(Solver, getattr(solvers, method))
             except AttributeError as e:
                 raise PydanticCustomError(
                     "solver",
@@ -69,7 +70,7 @@ class Config(BaseModel):
     def _str_to_renderer(cls, method: str | Renderer) -> Renderer:
         if isinstance(method, str):
             try:
-                return getattr(renderers, method)
+                return cast(Renderer, getattr(renderers, method))
             except AttributeError as e:
                 raise PydanticCustomError(
                     "renderer",
@@ -115,5 +116,5 @@ if __name__ == "__main__":
             for err in e.validation.errors():
                 msg = err.get("msg")
                 loc = err.get("loc")
-                locs = ", ".join([str(l) for l in loc])
+                locs = ", ".join([str(lo) for lo in loc])
                 print(f"{locs}: {msg}")
