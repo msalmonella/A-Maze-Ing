@@ -29,3 +29,9 @@ Random seed generator (use whatever hell I want) It must be reproducable so I ha
 2. NESW conversion PDF requirement.
 
 						------ FINISHED ------
+
+==========================================
+
+entry exit on the maze
+
+==========================================
