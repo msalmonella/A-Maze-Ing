@@ -3,20 +3,18 @@ from . import Generator
 from ..cell import Wall
 from ..models import Coordinate, Direction
 from ..errors import LockedWallError
-from ..seeder import seed_generator
-import random
+from random import Random
 
 
 class MazerTheMiner(Generator):
 
-    def __call__(self, maze: mazegen.MazeGenerator, seed: str = "") -> None:
-        rng = seed_generator(seed)
+    def __call__(self, maze: mazegen.MazeGenerator, rng: Random) -> None:
         self.mazer_the_miner(maze, rng, Coordinate(0, 0), set())
 
     def mazer_the_miner(
         self,
         maze: mazegen.MazeGenerator,
-        rng: random.Random,
+        rng: Random,
         head: Coordinate,
         processed: set[Coordinate],
     ) -> None:

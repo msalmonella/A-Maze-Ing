@@ -1,3 +1,4 @@
+from random import Random
 from .cell import Cell
 from .models import Path
 
@@ -6,6 +7,7 @@ Grid = list[list[Cell]]
 
 class MazeGenerator:
     grid: Grid
+    _rng = Random()
 
     def __init__(self, config_path: str):
         from .config import parse_config
@@ -24,7 +26,8 @@ class MazeGenerator:
         self.solver = cfg.solver()
         self.renderer = cfg.renderer()
 
-        self.grid = self._generate_grid()
+        self._rng.seed(self.seed if self.seed else None)
+        self.generate()
 
     def __repr__(self) -> str:
         return "\n".join(
@@ -37,8 +40,9 @@ class MazeGenerator:
     def solve(self) -> Path:
         return self.solver(self)
 
-    def generate(self, seed: str = "") -> None:
-        self.generator(self, seed=seed)
+    def generate(self) -> None:
+        self.grid = self._generate_grid()
+        self.generator(self, self._rng)
 
     def _pattern_42(self, grid: Grid) -> Grid:
         """Places permanent 42 pattern if fits into the grid"""
