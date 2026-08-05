@@ -6,7 +6,7 @@ from mazegen import MazeGenerator
 
 def main() -> None:
     maze = MazeGenerator(argv[1])
-    maze.generate(seed=maze.seed)
+    maze.generate()
     maze.render(maze.solve())
 
 
