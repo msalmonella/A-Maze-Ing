@@ -1,5 +1,12 @@
+from types import ModuleType
 from typing import cast
-from pydantic import BaseModel, Field, field_validator, ValidationError
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    ValidationError,
+    ValidationInfo,
+)
 from pydantic_core import PydanticCustomError
 from .models import Coordinate
 from .errors import ConfigError
@@ -37,47 +44,30 @@ class Config(BaseModel):
                 ) from e
         return value
 
-    @field_validator("generator", mode="before")
+    @field_validator("generator", "solver", "renderer", mode="before")
     @classmethod
-    def _str_to_generator(cls, method: str | Generator) -> Generator:
-        if isinstance(method, str):
-            try:
-                return cast(Generator, getattr(generators, method))
-            except AttributeError as e:
-                raise PydanticCustomError(
-                    "generator",
-                    "No such generator found named '{method}'",
-                    {"method": method},
-                ) from e
-        return method
+    def _lookup_class(
+        cls, value: str | ModuleType, info: ValidationInfo
+    ) -> ModuleType:
+        if not isinstance(value, str):
+            return value
 
-    @field_validator("solver", mode="before")
-    @classmethod
-    def _str_to_solver(cls, method: str | Solver) -> Solver:
-        if isinstance(method, str):
-            try:
-                return cast(Solver, getattr(solvers, method))
-            except AttributeError as e:
-                raise PydanticCustomError(
-                    "solver",
-                    "No such solver found named '{method}'",
-                    {"method": method},
-                ) from e
-        return method
+        assert info.field_name is not None
+        modules: dict[str, ModuleType] = {
+            "generator": generators,
+            "solver": solvers,
+            "renderer": renderers,
+        }
+        module = modules[info.field_name]
 
-    @field_validator("renderer", mode="before")
-    @classmethod
-    def _str_to_renderer(cls, method: str | Renderer) -> Renderer:
-        if isinstance(method, str):
-            try:
-                return cast(Renderer, getattr(renderers, method))
-            except AttributeError as e:
-                raise PydanticCustomError(
-                    "renderer",
-                    "No such renderer found named '{method}'",
-                    {"method": method},
-                ) from e
-        return method
+        try:
+            return cast(ModuleType, getattr(module, value))
+        except AttributeError as e:
+            raise PydanticCustomError(
+                "module_not_found",
+                "No such {field_name} found named '{method}'",
+                {"method": value, "field_name": info.field_name},
+            ) from e
 
 
 def parse_config(filepath: str) -> Config:
