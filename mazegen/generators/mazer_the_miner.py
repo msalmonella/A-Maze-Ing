@@ -2,6 +2,7 @@ import mazegen
 from . import Generator
 from ..cell import Wall
 from ..models import Coordinate, Direction
+from ..errors import LockedWallError
 from ..seeder import seed_generator
 import random
 
@@ -38,25 +39,24 @@ class MazerTheMiner(Generator):
                 case _:
                     raise Exception
 
-            if (
-                0 <= next_index.x < maze.width
-                and 0 <= next_index.y < maze.height
-                and next_index not in processed
-            ):
-                x, y = head
+            if next_index not in processed:
+                try:
+                    x, y = head
 
-                wall: Wall
-                match direction:
-                    case Direction.NORTH:
-                        wall = maze.grid[y][x].north
-                    case Direction.EAST:
-                        wall = maze.grid[y][x].east
-                    case Direction.SOUTH:
-                        wall = maze.grid[y][x].south
-                    case Direction.WEST:
-                        wall = maze.grid[y][x].west
-                    case _:
-                        raise Exception
-                wall.closed = False
+                    wall: Wall
+                    match direction:
+                        case Direction.NORTH:
+                            wall = maze.grid[y][x].north
+                        case Direction.EAST:
+                            wall = maze.grid[y][x].east
+                        case Direction.SOUTH:
+                            wall = maze.grid[y][x].south
+                        case Direction.WEST:
+                            wall = maze.grid[y][x].west
+                        case _:
+                            raise Exception
+                    wall.closed = False
+                except LockedWallError:
+                    continue
 
                 self.mazer_the_miner(maze, rng, next_index, processed)
