@@ -3,7 +3,7 @@
 ## Mandatory
 WIDTH=11
 HEIGHT=11
-ENTRY=9,9
+ENTRY=0,0
 EXIT=10,10
 OUTPUT_FILE=maze.txt
 PERFECT=False
@@ -12,4 +12,4 @@ PERFECT=False
 SEED=salmonella
 #GENERATOR=MazerTheMiner
 #SOLVER=BFS
-RENDERER=MlxRenderer
+RENDERER=AsciiRenderer
