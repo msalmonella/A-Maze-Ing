@@ -6,8 +6,7 @@ from mazegen import MazeGenerator
 
 def main() -> None:
     maze = MazeGenerator(argv[1])
-    maze.generate()
-    maze.render(maze.solve())
+    maze.render()
 
 
 if __name__ == "__main__":

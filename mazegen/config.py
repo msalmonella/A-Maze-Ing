@@ -12,7 +12,7 @@ from .models import Coordinate
 from .errors import ConfigError
 from .generators import Generator, MazerTheMiner
 from .solvers import Solver, BFS
-from .renderers import Renderer, HexWriter
+from .renderers import Renderer, AsciiRenderer
 from . import generators, solvers, renderers
 
 
@@ -29,7 +29,7 @@ class Config(BaseModel):
     seed: str = Field(default="")
     generator: type[Generator] = Field(default=MazerTheMiner)
     solver: type[Solver] = Field(default=BFS)
-    renderer: type[Renderer] = Field(default=HexWriter)
+    renderer: type[Renderer] = Field(default=AsciiRenderer)
 
     @field_validator("entry", "exit", mode="before")
     @classmethod

@@ -1,6 +1,7 @@
 from random import Random
 from .cell import Cell
 from .models import Path
+from .renderers import HexWriter
 
 Grid = list[list[Cell]]
 
@@ -8,6 +9,7 @@ Grid = list[list[Cell]]
 class MazeGenerator:
     grid: Grid
     _rng = Random()
+    _output_renderer = HexWriter()
 
     def __init__(self, config_path: str):
         from .config import parse_config
@@ -34,15 +36,16 @@ class MazeGenerator:
             " ".join(f"{cell.value:2}" for cell in row) for row in self.grid
         )
 
-    def render(self, solution: Path) -> None:
-        self.renderer(self, solution)
+    def render(self) -> None:
+        self.renderer(self, self.solver(self))
 
     def solve(self) -> Path:
         return self.solver(self)
 
     def generate(self) -> None:
-        self.grid = self._generate_grid()
+        self.grid = self._initialize_grid()
         self.generator(self, self._rng)
+        self._output_renderer(self, self.solver(self))
 
     def _pattern_42(self, grid: Grid) -> Grid:
         """Places permanent 42 pattern if fits into the grid"""
@@ -72,7 +75,7 @@ class MazeGenerator:
                     cell.lock()
         return grid
 
-    def _generate_grid(self) -> Grid:
+    def _initialize_grid(self) -> Grid:
         """Generate the initial maze grid with shared closed walls."""
         grid: Grid = []
 
