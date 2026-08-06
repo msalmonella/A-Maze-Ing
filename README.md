@@ -14,7 +14,7 @@ A maze generation programme
 
 ## Contributors
 
-**Cahit Atilla Bozkurt** ()
+**Cahit Atilla Bozkurt** (cahitatillabozkurt@gmail.com)
 
 **Ahmet Yasin Dede** (ahmetyasindd@gmail.com)
 
