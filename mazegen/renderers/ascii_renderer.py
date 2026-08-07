@@ -1,8 +1,9 @@
 import os
+import curses
 import mazegen
 from . import Renderer, Colors
 from ..cell import Cell as MazeCell
-from ..models import Path, Coordinate
+from ..models import Path
 from enum import StrEnum
 
 terminal_size = os.get_terminal_size()
@@ -79,8 +80,14 @@ def clear_space(maze: mazegen.MazeGenerator) -> None:
     print("\033[H", end="")
 
 
+class Renderer:
+    def draw(self, str) -> str:
+        return str
+
+
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
+        # render = Renderer()
         cell_sprite = CellSprite(1, 1)
         clear_space(maze)
 
@@ -93,4 +100,82 @@ class AsciiRenderer(Renderer):
                 )
 
             for line_parts in zip(*row_cells):
+                # render.draw("".join(line_parts))
                 print("".join(line_parts))
+
+# print("something in the way")
+# class App:
+
+#     def __init__(self, renderer):
+#         self.renderer = renderer
+#         self.running = True
+#         self.menu_index = 0
+
+#         self.menu = [
+#             "Start",
+#             "Settings",
+#             "Quit"
+#         ]
+
+#     def draw(self, stdscr):
+#         stdscr.clear()
+
+#         # draw your ascii renderer
+#         y = 0
+#         for line in self.renderer.draw():
+#             stdscr.addstr(y, 0, line)
+#             y += 1
+
+#         # draw menu underneath
+#         y += 1
+
+#         for i, item in enumerate(self.menu):
+#             prefix = "> " if i == self.menu_index else "  "
+#             stdscr.addstr(
+#                 y + i,
+#                 0,
+#                 prefix + item
+#             )
+
+#         stdscr.refresh()
+
+
+#     def handle_input(self, key):
+
+#         if key == curses.KEY_UP:
+#             self.menu_index -= 1
+
+#         elif key == curses.KEY_DOWN:
+#             self.menu_index += 1
+
+#         elif key in (10, 13, curses.KEY_ENTER):
+#             self.select()
+
+
+#         self.menu_index %= len(self.menu)
+
+
+#     def select(self):
+
+#         if self.menu[self.menu_index] == "Quit":
+#             self.running = False
+
+
+
+# def main(stdscr):
+
+#     curses.curs_set(0)
+#     stdscr.keypad(True)
+
+#     app = App(Renderer())
+
+#     while app.running:
+#         app.draw(stdscr)
+
+#         key = stdscr.getch()
+
+#         app.handle_input(key)
+
+
+# curses.wrapper(main)
+
