@@ -80,9 +80,9 @@ def clear_space(maze: mazegen.MazeGenerator) -> None:
     print("\033[H", end="")
 
 
-class Renderer:
-    def draw(self, str) -> str:
-        return str
+# class Renderer:
+#     def draw(self, str) -> str:
+#         return str
 
 
 class AsciiRenderer(Renderer):
