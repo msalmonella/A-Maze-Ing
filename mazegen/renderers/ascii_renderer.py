@@ -6,6 +6,7 @@ from ..cell import Cell as MazeCell
 from ..models import Path
 from enum import StrEnum
 
+stdscr = curses.initscr()
 terminal_size = os.get_terminal_size()
 RED = Colors.RED
 GREEN = Colors.GREEN
@@ -80,14 +81,20 @@ def clear_space(maze: mazegen.MazeGenerator) -> None:
     print("\033[H", end="")
 
 
-# class Renderer:
-#     def draw(self, str) -> str:
-#         return str
+class Ascii:
 
+    def __init__(self, renderer):
+        self.renderer = renderer
+        self.running = True
+        self.menu_index = 0
 
-class AsciiRenderer(Renderer):
-    def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
-        # render = Renderer()
+        self.menu = [
+            "Recreate Maze",
+            "Quit"
+        ]
+
+    def draw(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
+        stdscr.clear()
         cell_sprite = CellSprite(1, 1)
         clear_space(maze)
 
@@ -100,10 +107,43 @@ class AsciiRenderer(Renderer):
                 )
 
             for line_parts in zip(*row_cells):
-                # render.draw("".join(line_parts))
                 print("".join(line_parts))
+        stdscr.refresh()
 
-# print("something in the way")
+    def handle_input(self, key):
+
+        if key == curses.KEY_UP:
+            self.menu_index -= 1
+
+        elif key == curses.KEY_DOWN:
+            self.menu_index += 1
+
+        elif key in (10, 13, curses.KEY_ENTER):
+            self.select()
+
+
+        self.menu_index %= len(self.menu)
+
+    def select(self):
+
+        if self.menu[self.menu_index] == "Quit":
+            self.running = False
+
+def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
+
+    curses.curs_set(0)
+    stdscr.keypad(True)
+
+    ascii = Ascii(Renderer)
+
+    while ascii.running:
+        ascii.draw(maze, solution)
+
+        key = stdscr.getch()
+
+        ascii.handle_input(key)
+
+
 # class App:
 
 #     def __init__(self, renderer):
@@ -179,3 +219,6 @@ class AsciiRenderer(Renderer):
 
 # curses.wrapper(main)
 
+class AsciiRenderer(Renderer):
+    def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
+        curses.wrapper(main)
