@@ -1,7 +1,6 @@
 from random import Random
 from .cell import Cell
 from .models import Path
-from .renderers import HexWriter
 
 Grid = list[list[Cell]]
 
@@ -9,7 +8,6 @@ Grid = list[list[Cell]]
 class MazeGenerator:
     grid: Grid
     _rng = Random()
-    _output_renderer = HexWriter()
 
     def __init__(self, config_path: str):
         from .config import parse_config
@@ -45,7 +43,49 @@ class MazeGenerator:
     def generate(self) -> None:
         self.grid = self._initialize_grid()
         self.generator(self, self._rng)
-        self._output_renderer(self, self.solver(self))
+        self._hex_writer(self.solver(self))
+
+    def _hex_writer(self, solution: Path) -> None:
+        """writes in text format"""
+        entry_x, entry_y = self.entry
+        exit_x, exit_y = self.exit
+
+        with open(self.output_file, "w") as f:
+            print(self.output_file)
+            for row in self.grid:
+                line = ""
+                for cell in row:
+                    line += hex(cell.value)[2:]
+                f.write(line + "\n")
+
+            f.write("\n")
+            f.write(f"{entry_x},{entry_y}\n")
+            f.write(f"{exit_x},{exit_y}\n")
+            f.write(f"{"".join(self._nesw_conversion(solution))}")
+
+    def _nesw_conversion(self, path: Path) -> list[str]:
+        """Converts to NESW text format"""
+        nesw: list[str] = []
+        for i in range(len(path) - 1):
+            current = path[i]
+            next_cell = path[i + 1]
+
+            current_x, current_y = current
+            next_x, next_y = next_cell
+
+            if next_y > current_y:
+                nesw.append("N")
+
+            if next_x > current_x:
+                nesw.append("E")
+
+            if current_y > next_y:
+                nesw.append("S")
+
+            if current_x > next_x:
+                nesw.append("W")
+
+        return nesw
 
     def _pattern_42(self, grid: Grid) -> Grid:
         """Places permanent 42 pattern if fits into the grid"""
