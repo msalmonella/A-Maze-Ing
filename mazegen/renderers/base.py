@@ -1,16 +1,41 @@
 from abc import ABC, abstractmethod
 import mazegen
 from ..models import Path
-from enum import StrEnum
+from enum import IntEnum
 
 
-class Colors(StrEnum):
-    RED = "\033[31m"
-    GREEN = "\033[32m"
-    YELLOW = "\033[33m"
-    BLUE = "\033[34m"
+import curses
+from enum import IntEnum
 
-    RESET = "\033[0m"
+
+class Colors(IntEnum):
+    def __new__(cls, pair_id: int, fg: int, bg: int = -1):
+        obj = int.__new__(cls, pair_id)
+        obj._value_ = pair_id
+        return obj
+
+    def __init__(self, pair_id: int, fg: int, bg: int = -1):
+        self.fg = fg
+        self.bg = bg
+
+    RED     = (1, curses.COLOR_RED)
+    GREEN   = (2, curses.COLOR_GREEN)
+    BLUE    = (3, curses.COLOR_BLUE)
+    YELLOW  = (4, curses.COLOR_YELLOW)
+    CYAN    = (5, curses.COLOR_CYAN)
+    MAGENTA = (6, curses.COLOR_MAGENTA)
+    WHITE   = (7, curses.COLOR_WHITE)
+
+    @classmethod
+    def init_pairs(cls) -> None:
+        curses.start_color()
+        curses.use_default_colors()
+        for member in cls:
+            curses.init_pair(member.value, member.fg, member.bg)
+
+    @property
+    def pair(self) -> int:
+        return curses.color_pair(self.value)
 
 
 class Renderer(ABC):
