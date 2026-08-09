@@ -176,4 +176,5 @@ def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
 
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
-        curses.wrapper(main, maze, solution)
+        # curses.wrapper(main, maze, solution)
+        print(solution)
