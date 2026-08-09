@@ -17,6 +17,8 @@ class Glyph(StrEnum):
     WALL = "█"
     EXIT_POINT = f"{RED}█{RESET}"
     ENTRY_POINT = f"{GREEN}█{RESET}"
+    # EXIT_POINT = f"X"
+    # ENTRY_POINT = f"@"
 
 
 class CellSprite:
@@ -74,11 +76,11 @@ class CellSprite:
 
 def clear_space(maze: mazegen.MazeGenerator) -> None:
     """Responsible for clearing up the buffer"""
-    print("\033[H", end="")
+    stdscr.move(0, 0)
     for _ in range(terminal_size.columns):
         for _ in range(terminal_size.lines):
             print(Glyph.SPACE, end="")
-    print("\033[H", end="")
+    stdscr.move(0, 0)
 
 
 class Ascii:
@@ -96,7 +98,8 @@ class Ascii:
     def draw(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
         stdscr.clear()
         cell_sprite = CellSprite(1, 1)
-        clear_space(maze)
+
+        y = 0
 
         for y_value in range(maze.height):
             row_cells = []
@@ -107,7 +110,23 @@ class Ascii:
                 )
 
             for line_parts in zip(*row_cells):
-                print("".join(line_parts))
+                line = "".join(line_parts)
+                try:
+                    stdscr.addstr(y, 0, line)
+                except curses.error:
+                    pass
+                y += 1
+
+        # draw the menu underneath
+        y += 1
+
+        for i, item in enumerate(self.menu):
+            prefix = "> " if i == self.menu_index else "  "
+            try:
+                stdscr.addstr(y + i, 0, prefix + item)
+            except curses.error:
+                pass
+
         stdscr.refresh()
 
     def handle_input(self, key):
@@ -143,82 +162,6 @@ def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
 
         ascii.handle_input(key)
 
-
-# class App:
-
-#     def __init__(self, renderer):
-#         self.renderer = renderer
-#         self.running = True
-#         self.menu_index = 0
-
-#         self.menu = [
-#             "Start",
-#             "Settings",
-#             "Quit"
-#         ]
-
-#     def draw(self, stdscr):
-#         stdscr.clear()
-
-#         # draw your ascii renderer
-#         y = 0
-#         for line in self.renderer.draw():
-#             stdscr.addstr(y, 0, line)
-#             y += 1
-
-#         # draw menu underneath
-#         y += 1
-
-#         for i, item in enumerate(self.menu):
-#             prefix = "> " if i == self.menu_index else "  "
-#             stdscr.addstr(
-#                 y + i,
-#                 0,
-#                 prefix + item
-#             )
-
-#         stdscr.refresh()
-
-
-#     def handle_input(self, key):
-
-#         if key == curses.KEY_UP:
-#             self.menu_index -= 1
-
-#         elif key == curses.KEY_DOWN:
-#             self.menu_index += 1
-
-#         elif key in (10, 13, curses.KEY_ENTER):
-#             self.select()
-
-
-#         self.menu_index %= len(self.menu)
-
-
-#     def select(self):
-
-#         if self.menu[self.menu_index] == "Quit":
-#             self.running = False
-
-
-
-# def main(stdscr):
-
-#     curses.curs_set(0)
-#     stdscr.keypad(True)
-
-#     app = App(Renderer())
-
-#     while app.running:
-#         app.draw(stdscr)
-
-#         key = stdscr.getch()
-
-#         app.handle_input(key)
-
-
-# curses.wrapper(main)
-
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
-        curses.wrapper(main)
+        curses.wrapper(main, maze, solution)
