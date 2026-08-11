@@ -20,11 +20,13 @@ class Glyph(Enum):
     WALL = (1, "█")
     EXIT_POINT = (2, "█")
     ENTRY_POINT = (3, "█")
+    SOLUTION_PATH = (3, "█")
 
 
 GLYPH_COLORS: dict[Glyph, Colors] = {
     Glyph.EXIT_POINT: Colors.RED,
     Glyph.ENTRY_POINT: Colors.GREEN,
+    Glyph.SOLUTION_PATH: Colors.YELLOW,
 }
 
 
@@ -35,17 +37,19 @@ class CellSprite:
         self.width = width * 3
         self.height = height
 
+    def along_the_way(self, x: int, y: int, solution: Path) -> bool:
+        for i in solution:
+            if (x, y) == (i.x, i.y):
+                return True
+        return False
+
     def exit_condition(self, x: int, y: int, maze: mazegen.MazeGenerator) -> bool:
-        exit_x, exit_y = maze.exit
-        comparison: tuple[int, int] = x, y
-        if comparison == (exit_x, exit_y):
+        if (x, y) == maze.exit:
             return True
         return False
 
     def entry_condition(self, x: int, y: int, maze: mazegen.MazeGenerator) -> bool:
-        entry_x, entry_y = maze.entry
-        comparison: tuple[int, int] = x, y
-        if comparison == (entry_x, entry_y):
+        if (x, y) == maze.entry:
             return True
         return False
 
@@ -64,6 +68,8 @@ class CellSprite:
                 mid = Glyph.EXIT_POINT
             elif self.entry_condition(x, y, maze):
                 mid = Glyph.ENTRY_POINT
+            elif self.along_the_way(x, y, solution):
+                mid = Glyph.SOLUTION_PATH
             else:
                 mid = Glyph.SPACE
 
@@ -176,5 +182,7 @@ def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
 
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
-        # curses.wrapper(main, maze, solution)
-        print(solution)
+        curses.wrapper(main, maze, solution)
+        # print(solution[0].x)
+        # print(solution[0].y)
+
