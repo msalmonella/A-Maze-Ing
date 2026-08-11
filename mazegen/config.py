@@ -1,13 +1,14 @@
 from types import ModuleType
-from typing import cast
+from typing import cast, Self
 from pydantic import (
     BaseModel,
     Field,
     field_validator,
+    model_validator,
     ValidationError,
     ValidationInfo,
 )
-from pydantic_core import PydanticCustomError
+from pydantic_core import PydanticCustomError, InitErrorDetails
 from .models import Coordinate
 from .errors import ConfigError
 from .generators import Generator, MazerTheMiner
@@ -68,6 +69,42 @@ class Config(BaseModel):
                 "No such {field_name} found named '{method}'",
                 {"method": value, "field_name": info.field_name},
             ) from e
+
+    @model_validator(mode="after")
+    def _validate_entry_exit(self) -> Self:
+        errors: list[InitErrorDetails] = []
+
+        if self.entry == self.exit:
+            errors.append(
+                {
+                    "type": PydanticCustomError(
+                        "identical_points",
+                        "Entry and exit points must be different",
+                    ),
+                    "input": (self.entry, self.exit),
+                }
+            )
+
+        for name, point in [("entry", self.entry), ("exit", self.exit)]:
+            if point.x >= self.width or point.y >= self.height:
+                errors.append(
+                    {
+                        "type": PydanticCustomError(
+                            "point_out_of_bounds",
+                            "The {name} point is out of bounds",
+                            {"name": name},
+                        ),
+                        "loc": (name,),
+                        "input": point,
+                    }
+                )
+
+        if errors:
+            raise ValidationError.from_exception_data(
+                self.__class__.__name__, errors
+            )
+
+        return self
 
 
 def parse_config(filepath: str) -> Config:
