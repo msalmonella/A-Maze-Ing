@@ -1,15 +1,15 @@
 # Maze Config
 
 ## Mandatory
-WIDTH=25
-HEIGHT=25
+WIDTH=16
+HEIGHT=16
 ENTRY=0,0
-EXIT=24,24
+EXIT=15,15
 OUTPUT_FILE=maze.txt
 PERFECT=False
 
 ## Optional
-SEED=salmonella
+SEED=no_need
 #GENERATOR=MazerTheMiner
 #SOLVER=BFS
 RENDERER=AsciiRenderer
