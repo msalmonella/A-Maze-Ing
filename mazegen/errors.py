@@ -17,3 +17,7 @@ class ConfigError(MazeError):
 
 class LockedWallError(MazeError):
     """Attempt to modify a locked wall."""
+
+
+class PatternError(MazeError):
+    """Invalid attempt to place the 42 pattern."""

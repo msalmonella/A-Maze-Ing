@@ -1,6 +1,17 @@
 from random import Random
 from .cell import Cell
-from .models import Path
+from .models import Path, Coordinate
+from .errors import PatternError
+
+PATTERN_42 = [
+    "         ",
+    " X   XXX ",
+    " X     X ",
+    " XXX XXX ",
+    "   X X   ",
+    "   X XXX ",
+    "         ",
+]
 
 Grid = list[list[Cell]]
 
@@ -45,6 +56,11 @@ class MazeGenerator:
         self.generator(self, self._rng)
         self._hex_writer(self.solver(self))
 
+    def pattern_can_fit(self) -> bool:
+        return self.height >= len(PATTERN_42) and self.width >= len(
+            PATTERN_42[0]
+        )
+
     def _hex_writer(self, solution: Path) -> None:
         """writes in text format"""
         entry_x, entry_y = self.entry
@@ -87,32 +103,29 @@ class MazeGenerator:
 
         return nesw
 
-    def _pattern_42(self, grid: Grid) -> Grid:
+    def _place_pattern_42(self, grid: Grid) -> Grid:
         """Places permanent 42 pattern if fits into the grid"""
 
-        pattern = [
-            "X   XXX",
-            "X     X",
-            "XXX XXX",
-            "  X X  ",
-            "  X XXX",
-        ]
-        padding = 1
-
-        if (
-            self.height < len(pattern) + padding * 2
-            or self.width < len(pattern[0]) + padding * 2
-        ):
+        if not self.pattern_can_fit():
             return grid
 
-        for y, line in enumerate(pattern):
-            offset_y = (self.height - len(pattern)) // 2
+        to_be_locked: list[Coordinate] = []
+
+        for y, line in enumerate(PATTERN_42):
+            offset_y = (self.height - len(PATTERN_42)) // 2
             offset_x = (self.width - len(line)) // 2
 
             for x, char in enumerate(line):
-                cell = grid[y + offset_y][x + offset_x]
                 if char == "X":
-                    cell.lock()
+                    coord = Coordinate(x + offset_x, y + offset_y)
+                    to_be_locked.append(coord)
+                    if coord == self.entry or coord == self.exit:
+                        raise PatternError(
+                            "Cannot place 42 pattern on entry or exit points"
+                        )
+        for coord in to_be_locked:
+            cell = grid[coord.y][coord.x]
+            cell.lock()
         return grid
 
     def _initialize_grid(self) -> Grid:
@@ -133,4 +146,4 @@ class MazeGenerator:
 
                 grid[row].append(Cell(north=wall_above, west=wall_before))
 
-        return self._pattern_42(grid)
+        return self._place_pattern_42(grid)
