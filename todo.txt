@@ -1,2 +1,3 @@
-path should be drawn on the maze.
+calculate the max recursion
 
+move max recursion to somewhere i can use later
