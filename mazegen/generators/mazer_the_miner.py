@@ -1,10 +1,10 @@
+import sys
+from random import Random
+from typing import assert_never
 import mazegen
 from . import Generator
-from ..cell import Wall
 from ..models import Coordinate, Direction
 from ..errors import LockedWallError
-from random import Random
-import sys
 
 
 class MazerTheMiner(Generator):
@@ -37,7 +37,7 @@ class MazerTheMiner(Generator):
                 case Direction.WEST:
                     next_index = Coordinate(head.x - 1, head.y)
                 case _:
-                    raise Exception
+                    assert_never(direction)
 
             if next_index not in processed:
                 try:
