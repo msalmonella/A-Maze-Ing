@@ -87,6 +87,7 @@ class Ascii:
         self.stdscr = stdscr
         self.running = True
         self.menu_index = 0
+        self.regenerate = False
 
         self.menu = [
             "Recreate Maze",
@@ -161,8 +162,9 @@ class Ascii:
     def select(self):
         if self.menu[self.menu_index] == "Quit":
             self.running = False
-        elif self.menu[self.menu_index] == "Recreate":
-            pass
+        if self.menu[self.menu_index] == "Recreate Maze":
+            self.regenerate = True
+
 
 
 def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
@@ -173,10 +175,14 @@ def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
     ascii_view = Ascii(Renderer, stdscr)
 
     while ascii_view.running:
+        if ascii_view.regenerate:
+            maze.generate()
+            solution = maze.solve()
+            ascii_view.regenerate = False
+            stdscr.clear()
+
         ascii_view.draw(maze, solution)
-
         key = stdscr.getch()
-
         ascii_view.handle_input(key)
 
 
