@@ -1,8 +1,8 @@
 from typing import NamedTuple
-from enum import IntEnum
+from enum import IntFlag
 
 
-class Direction(IntEnum):
+class Direction(IntFlag):
     """Binary representation of closed walls."""
 
     NORTH = 0b0001

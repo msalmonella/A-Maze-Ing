@@ -43,18 +43,7 @@ class MazerTheMiner(Generator):
                 try:
                     x, y = head
 
-                    wall: Wall
-                    match direction:
-                        case Direction.NORTH:
-                            wall = maze.grid[y][x].north
-                        case Direction.EAST:
-                            wall = maze.grid[y][x].east
-                        case Direction.SOUTH:
-                            wall = maze.grid[y][x].south
-                        case Direction.WEST:
-                            wall = maze.grid[y][x].west
-                        case _:
-                            raise Exception
+                    wall = maze.grid[y][x].walls[direction]
                     wall.closed = False
                 except LockedWallError:
                     continue

@@ -1,6 +1,6 @@
 import mazegen
 from . import Solver
-from ..models import Coordinate, Path
+from ..models import Coordinate, Path, Direction
 
 
 class BFS(Solver):
@@ -27,13 +27,13 @@ class BFS(Solver):
             x, y = current
             if current == maze.exit:
                 break
-            if grid[y][x].north.closed == False:
+            if not grid[y][x].walls[Direction.NORTH].closed:
                 qvc_appender(Coordinate(x, y), Coordinate(x, y - 1))
-            if grid[y][x].south.closed == False:
+            if not grid[y][x].walls[Direction.SOUTH].closed:
                 qvc_appender(Coordinate(x, y), Coordinate(x, y + 1))
-            if grid[y][x].west.closed == False:
+            if not grid[y][x].walls[Direction.WEST].closed:
                 qvc_appender(Coordinate(x, y), Coordinate(x - 1, y))
-            if grid[y][x].east.closed == False:
+            if not grid[y][x].walls[Direction.EAST].closed:
                 qvc_appender(Coordinate(x, y), Coordinate(x + 1, y))
 
         while node is not None:

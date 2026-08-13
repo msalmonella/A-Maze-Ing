@@ -42,24 +42,25 @@ class Cell:
         south: Wall | None = None,
         west: Wall | None = None,
     ) -> None:
-        self.north = north if north is not None else Wall()
-        self.east = east if east is not None else Wall()
-        self.south = south if south is not None else Wall()
-        self.west = west if west is not None else Wall()
+        self.walls = {
+            Direction.NORTH: north if north is not None else Wall(),
+            Direction.EAST: east if east is not None else Wall(),
+            Direction.SOUTH: south if south is not None else Wall(),
+            Direction.WEST: west if west is not None else Wall(),
+        }
 
     @property
     def value(self) -> int:
         """Returns the integer representation of neighboring walls' states."""
-        return (
-            (Direction.NORTH if self.north.closed else 0)
-            | (Direction.EAST if self.east.closed else 0)
-            | (Direction.SOUTH if self.south.closed else 0)
-            | (Direction.WEST if self.west.closed else 0)
+
+        return sum(
+            direction for direction, wall in self.walls.items() if wall.closed
         )
 
     def lock(self) -> None:
         """Locks all of the walls without raising an error."""
-        for wall in [self.north, self.east, self.south, self.west]:
+
+        for wall in self.walls.values():
             if not wall.locked:
                 wall.closed = True
                 wall.locked = True

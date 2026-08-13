@@ -2,7 +2,7 @@ import curses
 import mazegen
 from . import Renderer, Colors
 from ..cell import Cell as MazeCell
-from ..models import Path
+from ..models import Path, Direction
 from enum import Enum
 
 
@@ -43,12 +43,16 @@ class CellSprite:
                 return True
         return False
 
-    def exit_condition(self, x: int, y: int, maze: mazegen.MazeGenerator) -> bool:
+    def exit_condition(
+        self, x: int, y: int, maze: mazegen.MazeGenerator
+    ) -> bool:
         if (x, y) == maze.exit:
             return True
         return False
 
-    def entry_condition(self, x: int, y: int, maze: mazegen.MazeGenerator) -> bool:
+    def entry_condition(
+        self, x: int, y: int, maze: mazegen.MazeGenerator
+    ) -> bool:
         if (x, y) == maze.entry:
             return True
         return False
@@ -58,11 +62,17 @@ class CellSprite:
     ) -> list[list[Glyph]]:
         rows: list[list[Glyph]] = []
 
-        north_glyph = Glyph.WALL if cell.north.closed else Glyph.SPACE
+        north_glyph = (
+            Glyph.WALL if cell.walls[Direction.NORTH].closed else Glyph.SPACE
+        )
         rows.append([Glyph.WALL] + [north_glyph] * self.width + [Glyph.WALL])
 
-        west_glyph = Glyph.WALL if cell.west.closed else Glyph.SPACE
-        east_glyph = Glyph.WALL if cell.east.closed else Glyph.SPACE
+        west_glyph = (
+            Glyph.WALL if cell.walls[Direction.WEST].closed else Glyph.SPACE
+        )
+        east_glyph = (
+            Glyph.WALL if cell.walls[Direction.EAST].closed else Glyph.SPACE
+        )
         for _ in range(self.height):
             if self.exit_condition(x, y, maze):
                 mid = Glyph.EXIT_POINT
@@ -75,7 +85,9 @@ class CellSprite:
 
             rows.append([west_glyph] + [mid] * self.width + [east_glyph])
 
-        south_glyph = Glyph.WALL if cell.south.closed else Glyph.SPACE
+        south_glyph = (
+            Glyph.WALL if cell.walls[Direction.SOUTH].closed else Glyph.SPACE
+        )
         rows.append([Glyph.WALL] + [south_glyph] * self.width + [Glyph.WALL])
 
         return rows
@@ -127,7 +139,9 @@ class Ascii:
             for x_value in range(maze.width):
                 maze_cell = maze.grid[y_value][x_value]
                 row_cells.append(
-                    cell_sprite.sprite(maze_cell, maze, solution, x_value, y_value)
+                    cell_sprite.sprite(
+                        maze_cell, maze, solution, x_value, y_value
+                    )
                 )
 
             for line_parts in zip(*row_cells):
@@ -166,7 +180,6 @@ class Ascii:
             self.regenerate = True
 
 
-
 def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
     Colors.init_pairs()
     curses.curs_set(0)
@@ -191,4 +204,3 @@ class AsciiRenderer(Renderer):
         curses.wrapper(main, maze, solution)
         # print(solution[0].x)
         # print(solution[0].y)
-

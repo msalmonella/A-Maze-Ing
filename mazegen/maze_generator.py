@@ -1,6 +1,6 @@
 from random import Random
 from .cell import Cell
-from .models import Path, Coordinate
+from .models import Path, Coordinate, Direction
 from .errors import PatternError
 
 PATTERN_42 = [
@@ -136,8 +136,16 @@ class MazeGenerator:
             grid.append([])
 
             for column in range(self.width):
-                wall_above = grid[row - 1][column].south if row else None
-                wall_before = grid[row][column - 1].east if column else None
+                wall_above = (
+                    grid[row - 1][column].walls[Direction.SOUTH]
+                    if row
+                    else None
+                )
+                wall_before = (
+                    grid[row][column - 1].walls[Direction.EAST]
+                    if column
+                    else None
+                )
 
                 if wall_above:
                     wall_above.locked = False
