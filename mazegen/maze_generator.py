@@ -22,6 +22,7 @@ class MazeGenerator:
 
     def __init__(self, config_path: str):
         from .config import parse_config
+        from .recursion import apply_recursion_limit
 
         cfg = parse_config(config_path)
 
@@ -31,6 +32,7 @@ class MazeGenerator:
         self.exit = cfg.exit
         self.output_file = cfg.output_file
         self.perfect = cfg.perfect
+        apply_recursion_limit(self.width, self.height)
 
         self.seed = cfg.seed
         self.generator = cfg.generator()
