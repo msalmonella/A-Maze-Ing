@@ -22,7 +22,7 @@ class MazerTheMiner(Generator):
     ) -> None:
         """Recursive function to create maze by digging into walls"""
         processed.add(head)
-        directions = [d.value for d in Direction]
+        directions = list(Direction)
         rng.shuffle(directions)
 
         for direction in directions:
