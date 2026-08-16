@@ -19,21 +19,12 @@ class Prim(Generator):
     ) -> None:
         """Function to create maze by Prim's minimal spanning tree algorithm"""
 
-        frontiers: list[tuple[Wall | None, Coordinate]] = [(None, maze.entry)]
-        visited: set[Coordinate] = set()
+        frontiers: list[tuple[Wall, Coordinate]] = []
+        visited: set[Coordinate] = {maze.entry}
 
-        while frontiers:
-            frontier, coord = frontiers.pop(rng.randrange(len(frontiers)))
-
-            if coord in visited:
-                continue
-            visited.add(coord)
-
+        def add_frontiers(coord: Coordinate) -> None:
             x, y = coord
             cell = maze.grid[y][x]
-
-            if frontier:
-                frontier.closed = False
 
             for direction, wall in cell.walls.items():
                 if not wall.locked:
@@ -53,3 +44,14 @@ class Prim(Generator):
                     next_cell = Coordinate(x + delta[0], y + delta[1])
                     if next_cell not in visited:
                         frontiers.append((wall, next_cell))
+
+        add_frontiers(maze.entry)
+
+        while frontiers:
+            frontier, coord = frontiers.pop(rng.randrange(len(frontiers)))
+
+            if coord in visited:
+                continue
+            visited.add(coord)
+            frontier.closed = False
+            add_frontiers(coord)
