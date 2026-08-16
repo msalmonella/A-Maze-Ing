@@ -7,6 +7,7 @@ from ..models import Coordinate, Direction
 
 
 class Prim(Generator):
+    """Generates a maze using randomized Prim's algorithm."""
 
     def __call__(self, maze: mazegen.MazeGenerator, rng: Random) -> None:
         self.prim(maze, rng)
@@ -18,22 +19,21 @@ class Prim(Generator):
     ) -> None:
         """Function to create maze by Prim's minimal spanning tree algorithm"""
 
-        frontiers: dict[Coordinate, Wall | None] = {maze.entry: None}
+        frontiers: list[tuple[Wall | None, Coordinate]] = [(None, maze.entry)]
         visited: set[Coordinate] = set()
 
         while frontiers:
-            frontier, door = list(frontiers.items())[
-                rng.randrange(len(frontiers))
-            ]
-            del frontiers[frontier]
+            frontier, coord = frontiers.pop(rng.randrange(len(frontiers)))
 
-            x, y = frontier
+            if coord in visited:
+                continue
+            visited.add(coord)
+
+            x, y = coord
             cell = maze.grid[y][x]
 
-            if door:
-                door.closed = False
-
-            visited.add(frontier)
+            if frontier:
+                frontier.closed = False
 
             for direction, wall in cell.walls.items():
                 if not wall.locked:
@@ -52,4 +52,4 @@ class Prim(Generator):
 
                     next_cell = Coordinate(x + delta[0], y + delta[1])
                     if next_cell not in visited:
-                        frontiers.setdefault(next_cell, wall)
+                        frontiers.append((wall, next_cell))
