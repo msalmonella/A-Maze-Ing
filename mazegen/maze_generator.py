@@ -1,7 +1,7 @@
 from random import Random
 from .cell import Cell
 from .models import Path, Coordinate, Direction
-from .errors import PatternError
+from .errors import PatternError, LockedWallError
 
 PATTERN_42 = [
     "         ",
@@ -54,12 +54,27 @@ class MazeGenerator:
     def generate(self) -> None:
         self.grid = self._initialize_grid()
         self.generator(self, self._rng)
+        if not self.perfect:
+            self._non_perfect()
         self._hex_writer(self.solver(self))
 
     def pattern_can_fit(self) -> bool:
         return self.height >= len(PATTERN_42) and self.width >= len(
             PATTERN_42[0]
         )
+
+    def _non_perfect(self) -> None:
+        for row in self.grid:
+            for cell in row:
+                if cell.value.bit_count() == 3:
+                    for _, wall in cell.walls.items():
+                        if wall.closed:
+                            try:
+                                wall.closed = False
+                            except LockedWallError:
+                                continue
+                            else:
+                                break
 
     def _hex_writer(self, solution: Path) -> None:
         """writes in text format"""
