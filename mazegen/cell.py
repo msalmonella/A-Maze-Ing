@@ -50,12 +50,14 @@ class Cell:
         }
 
     @property
-    def value(self) -> int:
-        """Returns the integer representation of neighboring walls' states."""
+    def value(self) -> Direction:
+        """The integer flag representation of neighboring walls' states."""
 
-        return sum(
-            direction for direction, wall in self.walls.items() if wall.closed
-        )
+        value = Direction(0)
+        for direction, wall in self.walls.items():
+            if wall.closed:
+                value |= direction
+        return value
 
     def lock(self) -> None:
         """Locks all of the walls without raising an error."""
