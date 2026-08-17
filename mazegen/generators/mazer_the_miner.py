@@ -1,6 +1,5 @@
 import sys
 from random import Random
-from typing import assert_never
 import mazegen
 from . import Generator
 from ..models import Coordinate, Direction
@@ -21,29 +20,20 @@ class MazerTheMiner(Generator):
         processed: set[Coordinate],
     ) -> None:
         """Recursive function to create maze by digging into walls"""
+
+        x, y = head
+        cell = maze.grid[y][x]
         processed.add(head)
+
         directions = list(Direction)
         rng.shuffle(directions)
 
         for direction in directions:
-            next_index: Coordinate
-            match direction:
-                case Direction.NORTH:
-                    next_index = Coordinate(head.x, head.y - 1)
-                case Direction.EAST:
-                    next_index = Coordinate(head.x + 1, head.y)
-                case Direction.SOUTH:
-                    next_index = Coordinate(head.x, head.y + 1)
-                case Direction.WEST:
-                    next_index = Coordinate(head.x - 1, head.y)
-                case _:
-                    assert_never(direction)
+            next_index = cell.neighbor(direction)
 
             if next_index not in processed:
                 try:
-                    x, y = head
-
-                    wall = maze.grid[y][x].walls[direction]
+                    wall = cell.walls[direction]
                     wall.closed = False
                 except LockedWallError:
                     continue

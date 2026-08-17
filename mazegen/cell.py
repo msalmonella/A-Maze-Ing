@@ -1,4 +1,4 @@
-from .models import Direction
+from .models import Direction, Coordinate
 from .errors import LockedWallError
 
 
@@ -37,11 +37,13 @@ class Cell:
 
     def __init__(
         self,
+        location: Coordinate,
         north: Wall | None = None,
         east: Wall | None = None,
         south: Wall | None = None,
         west: Wall | None = None,
     ) -> None:
+        self.location = location
         self.walls = {
             Direction.NORTH: north if north is not None else Wall(),
             Direction.EAST: east if east is not None else Wall(),
@@ -66,3 +68,17 @@ class Cell:
             if not wall.locked:
                 wall.closed = True
                 wall.locked = True
+
+    def neighbor(self, direction: Direction) -> Coordinate:
+        """Returns the coordinate of a neighboring cell in a given direction"""
+
+        OFFSET = {
+            Direction.NORTH: (0, -1),
+            Direction.EAST: (1, 0),
+            Direction.SOUTH: (0, 1),
+            Direction.WEST: (-1, 0),
+        }
+        dx, dy = OFFSET[direction]
+        x, y = self.location
+
+        return Coordinate(x + dx, y + dy)

@@ -1,9 +1,8 @@
 from random import Random
-from typing import assert_never
 import mazegen
 from . import Generator
 from ..cell import Wall
-from ..models import Coordinate, Direction
+from ..models import Coordinate
 
 
 class Prim(Generator):
@@ -28,20 +27,7 @@ class Prim(Generator):
 
             for direction, wall in cell.walls.items():
                 if not wall.locked:
-                    delta = (0, 0)
-                    match direction:
-                        case Direction.NORTH:
-                            delta = (0, -1)
-                        case Direction.EAST:
-                            delta = (1, 0)
-                        case Direction.SOUTH:
-                            delta = (0, 1)
-                        case Direction.WEST:
-                            delta = (-1, 0)
-                        case _:
-                            assert_never(direction)
-
-                    next_cell = Coordinate(x + delta[0], y + delta[1])
+                    next_cell = cell.neighbor(direction)
                     if next_cell not in visited:
                         frontiers.append((wall, next_cell))
 
