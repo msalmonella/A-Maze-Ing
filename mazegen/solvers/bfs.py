@@ -12,7 +12,6 @@ class BFS(Solver):
         queue: Path = [maze.entry]
         visited: set[Coordinate] = {maze.entry}
         came_from: dict[Coordinate, Coordinate | None] = {maze.entry: None}
-        grid = maze.grid
 
         def qvc_appender(
             current_pos: Coordinate, queue_pos: Coordinate
@@ -24,17 +23,15 @@ class BFS(Solver):
 
         while queue:
             current = queue.pop(0)
-            x, y = current
             if current == maze.exit:
                 break
-            if not grid[y][x].walls[Direction.NORTH].closed:
-                qvc_appender(Coordinate(x, y), Coordinate(x, y - 1))
-            if not grid[y][x].walls[Direction.SOUTH].closed:
-                qvc_appender(Coordinate(x, y), Coordinate(x, y + 1))
-            if not grid[y][x].walls[Direction.WEST].closed:
-                qvc_appender(Coordinate(x, y), Coordinate(x - 1, y))
-            if not grid[y][x].walls[Direction.EAST].closed:
-                qvc_appender(Coordinate(x, y), Coordinate(x + 1, y))
+
+            x, y = current
+            cell = maze.grid[y][x]
+
+            for direction in Direction:
+                if not cell.walls[direction].closed:
+                    qvc_appender(current, cell.neighbor(direction))
 
         while node is not None:
             path.append(node)
