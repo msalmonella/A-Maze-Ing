@@ -152,6 +152,12 @@ class MazeGenerator:
                 if wall_before:
                     wall_before.locked = False
 
-                grid[row].append(Cell(north=wall_above, west=wall_before))
+                grid[row].append(
+                    Cell(
+                        Coordinate(column, row),
+                        north=wall_above,
+                        west=wall_before,
+                    )
+                )
 
         return self._place_pattern_42(grid)
