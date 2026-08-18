@@ -33,7 +33,7 @@ class MazeGenerator:
         self.perfect = cfg.perfect
 
         self.seed = cfg.seed
-        self.generator = cfg.generator()
+        self.algorithm = cfg.algorithm()
         self.solver = cfg.solver()
         self.renderer = cfg.renderer()
 
@@ -53,7 +53,7 @@ class MazeGenerator:
 
     def generate(self) -> None:
         self.grid = self._initialize_grid()
-        self.generator(self, self._rng)
+        self.algorithm(self, self._rng)
         if not self.perfect:
             self._non_perfect()
         self._hex_writer(self.solver(self))

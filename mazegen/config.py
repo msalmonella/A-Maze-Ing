@@ -11,10 +11,10 @@ from pydantic import (
 from pydantic_core import PydanticCustomError, InitErrorDetails
 from .models import Coordinate
 from .errors import ConfigError
-from .generators import Generator, MazerTheMiner
+from .algorithms import Algorithm, MazerTheMiner
 from .solvers import Solver, BFS
 from .renderers import Renderer, AsciiRenderer
-from . import generators, solvers, renderers
+from . import algorithms, solvers, renderers
 
 
 class Config(BaseModel):
@@ -28,7 +28,7 @@ class Config(BaseModel):
     perfect: bool
 
     seed: str = Field(default="")
-    generator: type[Generator] = Field(default=MazerTheMiner)
+    algorithm: type[Algorithm] = Field(default=MazerTheMiner)
     solver: type[Solver] = Field(default=BFS)
     renderer: type[Renderer] = Field(default=AsciiRenderer)
 
@@ -45,7 +45,7 @@ class Config(BaseModel):
                 ) from e
         return value
 
-    @field_validator("generator", "solver", "renderer", mode="before")
+    @field_validator("algorithm", "solver", "renderer", mode="before")
     @classmethod
     def _lookup_class(
         cls, value: str | ModuleType, info: ValidationInfo
@@ -55,7 +55,7 @@ class Config(BaseModel):
 
         assert info.field_name is not None
         modules: dict[str, ModuleType] = {
-            "generator": generators,
+            "algorithm": algorithms,
             "solver": solvers,
             "renderer": renderers,
         }

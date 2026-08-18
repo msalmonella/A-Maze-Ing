@@ -1,21 +1,17 @@
 from random import Random
 import mazegen
-from . import Generator
+from . import Algorithm
 from ..cell import Wall
 from ..models import Coordinate
 
 
-class Prim(Generator):
+class Prim(Algorithm):
     """Generates a maze using randomized Prim's algorithm."""
 
     def __call__(self, maze: mazegen.MazeGenerator, rng: Random) -> None:
         self.prim(maze, rng)
 
-    def prim(
-        self,
-        maze: mazegen.MazeGenerator,
-        rng: Random,
-    ) -> None:
+    def prim(self, maze: mazegen.MazeGenerator, rng: Random) -> None:
         """Function to create maze by Prim's minimal spanning tree algorithm"""
 
         frontiers: list[tuple[Wall, Coordinate]] = []

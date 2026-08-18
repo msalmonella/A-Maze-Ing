@@ -3,7 +3,7 @@ from random import Random
 import mazegen
 
 
-class Generator(ABC):
+class Algorithm(ABC):
 
     @abstractmethod
     def __call__(self, maze: mazegen.MazeGenerator, rng: Random) -> None:

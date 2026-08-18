@@ -1,12 +1,12 @@
 import sys
 from random import Random
 import mazegen
-from . import Generator
+from . import Algorithm
 from ..models import Coordinate, Direction
 from ..errors import LockedWallError
 
 
-class MazerTheMiner(Generator):
+class MazerTheMiner(Algorithm):
 
     def __call__(self, maze: mazegen.MazeGenerator, rng: Random) -> None:
         self._apply_recursion_limit(maze.width, maze.height)
