@@ -203,12 +203,17 @@ class Ascii:
             self.show_solution_trigger = True
 
 
-def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
+def main(stdscr: curses.window, maze: mazegen.MazeGenerator):
     Colors.init_pairs()
     curses.curs_set(0)
     stdscr.keypad(True)
+    stdscr.timeout(25)
 
     ascii_view = Ascii(Renderer, stdscr)
+
+    generation = maze.generate()
+    generating = True
+    solution = []
 
     while ascii_view.running:
         if ascii_view.show_solution_trigger:
@@ -216,17 +221,23 @@ def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
             ascii_view.show_solution_trigger = False
             stdscr.clear()
 
-        if ascii_view.regenerate:
-            maze.generate()
-            solution = maze.solve()
-            ascii_view.regenerate = False
-            stdscr.clear()
-
+        if generating:
+            try:
+                next(generation)
+            except StopIteration:
+                generating = False
+                solution = maze.solve()
         ascii_view.draw(maze, solution, ascii_view.show_solution)
         key = stdscr.getch()
         ascii_view.handle_input(key)
 
+        if ascii_view.regenerate:
+            generation = maze.generate()
+            generating = True
+            solution = []
+            ascii_view.regenerate = False
+
 
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
-        curses.wrapper(main, maze, solution)
+        curses.wrapper(main, maze)

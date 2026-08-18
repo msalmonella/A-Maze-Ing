@@ -1,4 +1,5 @@
 from random import Random
+from collections.abc import Generator
 from .cell import Cell
 from .models import Path, Coordinate, Direction
 from .errors import PatternError, LockedWallError
@@ -38,7 +39,7 @@ class MazeGenerator:
         self.renderer = cfg.renderer()
 
         self._rng.seed(self.seed if self.seed else None)
-        self.generate()
+        self.grid = self._initialize_grid()
 
     def __repr__(self) -> str:
         return "\n".join(
@@ -51,11 +52,11 @@ class MazeGenerator:
     def solve(self) -> Path:
         return self.solver(self)
 
-    def generate(self) -> None:
+    def generate(self) -> Generator[None, None, None]:
         self.grid = self._initialize_grid()
-        self.algorithm(self, self._rng)
+        yield from self.algorithm(self, self._rng)
         if not self.perfect:
-            self._non_perfect()
+            yield from self._non_perfect()
         self._hex_writer(self.solver(self))
 
     def pattern_can_fit(self) -> bool:
@@ -63,7 +64,7 @@ class MazeGenerator:
             PATTERN_42[0]
         )
 
-    def _non_perfect(self) -> None:
+    def _non_perfect(self) -> Generator[None]:
         for row in self.grid:
             for cell in row:
                 if cell.value.bit_count() == 3:
@@ -74,6 +75,7 @@ class MazeGenerator:
                             except LockedWallError:
                                 continue
                             else:
+                                yield
                                 break
 
     def _hex_writer(self, solution: Path) -> None:
