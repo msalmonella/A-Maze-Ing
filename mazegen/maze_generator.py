@@ -19,6 +19,7 @@ Grid = list[list[Cell]]
 
 class MazeGenerator:
     grid: Grid
+    _solution: Path = []
     _rng = Random()
 
     def __init__(self, config_path: str):
@@ -47,18 +48,23 @@ class MazeGenerator:
             " ".join(f"{cell.value:2}" for cell in row) for row in self.grid
         )
 
-    def render(self) -> None:
-        self.renderer(self, self.solver(self))
+    @property
+    def solution(self) -> Path:
+        return self._solution
 
-    def solve(self) -> Path:
-        return self.solver(self)
+    def render(self) -> None:
+        self.renderer(self)
 
     def generate(self) -> Generator[None, None, None]:
+        self._solution = []
         self.grid = self._initialize_grid()
+
         yield from self.algorithm(self, self._rng)
         if not self.perfect:
             yield from self._non_perfect()
-        self._hex_writer(self.solver(self))
+
+        self._solution = self.solver(self)
+        self._hex_writer(self.solution)
 
     def pattern_can_fit(self) -> bool:
         return self.height >= len(PATTERN_42) and self.width >= len(
