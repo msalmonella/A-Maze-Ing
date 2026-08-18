@@ -20,7 +20,7 @@ class Glyph(Enum):
     WALL = (1, "█")
     EXIT_POINT = (2, "█")
     ENTRY_POINT = (3, "█")
-    SOLUTION_PATH = (3, "█")
+    SOLUTION_PATH = (4, "█")
 
 
 GLYPH_COLORS: dict[Glyph, Colors] = {
@@ -58,7 +58,11 @@ class CellSprite:
         return False
 
     def sprite(
-        self, cell: MazeCell, maze: mazegen.MazeGenerator, solution: Path, x, y
+        self, cell: MazeCell,
+        maze: mazegen.MazeGenerator,
+        solution: Path,
+        x, y,
+        show_solution: bool,
     ) -> list[list[Glyph]]:
         rows: list[list[Glyph]] = []
 
@@ -79,7 +83,10 @@ class CellSprite:
             elif self.entry_condition(x, y, maze):
                 mid = Glyph.ENTRY_POINT
             elif self.along_the_way(x, y, solution):
-                mid = Glyph.SOLUTION_PATH
+                if show_solution:
+                    mid = Glyph.SOLUTION_PATH
+                else:
+                    mid = Glyph.SPACE
             else:
                 mid = Glyph.SPACE
 
@@ -100,8 +107,12 @@ class Ascii:
         self.running = True
         self.menu_index = 0
         self.regenerate = False
+        self.show_solution = False
+        self.show_solution_trigger = False
 
-        self.menu = [
+    def _menu_items(self) -> list[str]:
+        return [
+            "Show Solution: YES" if self.show_solution else "Show Solution: NO",
             "Recreate Maze",
             "Quit",
         ]
@@ -128,7 +139,12 @@ class Ascii:
             col += len(chunk)
             i = j
 
-    def draw(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
+    def draw(
+        self,
+        maze: mazegen.MazeGenerator,
+        solution: Path,
+        show_solution: bool,
+    ) -> None:
         self.stdscr.erase()
         cell_sprite = CellSprite(1, 1)
 
@@ -140,7 +156,8 @@ class Ascii:
                 maze_cell = maze.grid[y_value][x_value]
                 row_cells.append(
                     cell_sprite.sprite(
-                        maze_cell, maze, solution, x_value, y_value
+                        maze_cell, maze, solution, x_value, y_value,
+                        show_solution,
                     )
                 )
 
@@ -154,7 +171,8 @@ class Ascii:
         # draw the menu underneath
         y += 1
 
-        for i, item in enumerate(self.menu):
+        menu = self._menu_items()
+        for i, item in enumerate(menu):
             prefix = "> " if i == self.menu_index else "  "
             try:
                 self.stdscr.addstr(y + i, 0, prefix + item)
@@ -164,6 +182,7 @@ class Ascii:
         self.stdscr.refresh()
 
     def handle_input(self, key):
+        menu = self._menu_items()
         if key == curses.KEY_UP:
             self.menu_index -= 1
         elif key == curses.KEY_DOWN:
@@ -171,13 +190,17 @@ class Ascii:
         elif key in (10, 13, curses.KEY_ENTER):
             self.select()
 
-        self.menu_index %= len(self.menu)
+        self.menu_index %= len(menu)
 
     def select(self):
-        if self.menu[self.menu_index] == "Quit":
+        menu = self._menu_items()
+        choice = menu[self.menu_index]
+        if choice == "Quit":
             self.running = False
-        if self.menu[self.menu_index] == "Recreate Maze":
+        elif choice == "Recreate Maze":
             self.regenerate = True
+        elif choice.startswith("Show Solution"):
+            self.show_solution_trigger = True
 
 
 def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
@@ -188,13 +211,18 @@ def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
     ascii_view = Ascii(Renderer, stdscr)
 
     while ascii_view.running:
+        if ascii_view.show_solution_trigger:
+            ascii_view.show_solution = not ascii_view.show_solution
+            ascii_view.show_solution_trigger = False
+            stdscr.clear()
+
         if ascii_view.regenerate:
             maze.generate()
             solution = maze.solve()
             ascii_view.regenerate = False
             stdscr.clear()
 
-        ascii_view.draw(maze, solution)
+        ascii_view.draw(maze, solution, ascii_view.show_solution)
         key = stdscr.getch()
         ascii_view.handle_input(key)
 
@@ -202,5 +230,3 @@ def main(stdscr, maze: mazegen.MazeGenerator, solution: Path):
 class AsciiRenderer(Renderer):
     def __call__(self, maze: mazegen.MazeGenerator, solution: Path) -> None:
         curses.wrapper(main, maze, solution)
-        # print(solution[0].x)
-        # print(solution[0].y)
