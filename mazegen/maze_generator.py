@@ -34,6 +34,7 @@ class MazeGenerator:
         self.perfect = cfg.perfect
 
         self.seed = cfg.seed
+        self.sps = cfg.sps
         self.algorithm = cfg.algorithm()
         self.solver = cfg.solver()
         self.renderer = cfg.renderer()

@@ -13,3 +13,4 @@ SEED=no_need
 #ALGORITHM=Prim
 #SOLVER=BFS
 RENDERER=AsciiRenderer
+#SPS=24

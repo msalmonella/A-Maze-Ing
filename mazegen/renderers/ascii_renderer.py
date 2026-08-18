@@ -207,7 +207,7 @@ def main(stdscr: curses.window, maze: mazegen.MazeGenerator):
     Colors.init_pairs()
     curses.curs_set(0)
     stdscr.keypad(True)
-    stdscr.timeout(25)
+    stdscr.timeout(round(1000 / maze.sps))
 
     ascii_view = Ascii(Renderer, stdscr)
 
