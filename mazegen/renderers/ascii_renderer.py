@@ -108,7 +108,7 @@ class Ascii:
         self.stdscr = stdscr
         self.running = True
         self.menu_index = 0
-        self.regenerate = False
+        self.regenerate = True
         self.show_solution = False
         self.show_solution_trigger = False
 
@@ -234,26 +234,26 @@ class AsciiRenderer(Renderer):
 
         ascii_view = Ascii(Renderer, stdscr)
 
-        generation = maze.generate()
-        generating = True
+        while ascii_view.regenerate:
+            ascii_view.regenerate = False
+            generation = maze.generate()
+            generating = True
 
-        while ascii_view.running:
-            if ascii_view.show_solution_trigger:
-                ascii_view.show_solution = not ascii_view.show_solution
-                ascii_view.show_solution_trigger = False
-                # stdscr.clear()
+            while ascii_view.running:
+                if ascii_view.show_solution_trigger:
+                    ascii_view.show_solution = not ascii_view.show_solution
+                    ascii_view.show_solution_trigger = False
+                    # stdscr.clear()
 
-            if generating:
-                try:
-                    next(generation)
-                except StopIteration:
-                    generating = False
+                if generating:
+                    try:
+                        next(generation)
+                    except StopIteration:
+                        generating = False
 
-            ascii_view.draw(maze, maze.solution, ascii_view.show_solution)
-            key = stdscr.getch()
-            ascii_view.handle_input(key)
+                ascii_view.draw(maze, maze.solution, ascii_view.show_solution)
+                key = stdscr.getch()
+                ascii_view.handle_input(key)
 
-            if ascii_view.regenerate:
-                generation = maze.generate()
-                generating = True
-                ascii_view.regenerate = False
+                if ascii_view.regenerate:
+                    break
