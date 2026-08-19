@@ -1,7 +1,6 @@
 import curses
 from enum import Enum, StrEnum
 from functools import reduce
-from operator import or_
 from dataclasses import dataclass
 import mazegen
 from . import Renderer, Colors
@@ -42,8 +41,7 @@ class Sprite:
     center: Glyph
 
     location: Coordinate
-
-    WIDTH: int = 4
+    width: int = 4
 
     @classmethod
     def from_cell(
@@ -92,7 +90,7 @@ class Sprite:
         if show_solution and cell.location in maze.solution:
             return Glyph.SOLUTION
 
-        if cell.value == reduce(or_, Direction, Direction(0)):
+        if cell.value == reduce(lambda a, b: a | b, Direction, Direction(0)):
             return Glyph.PATTERN
 
         return Glyph.SPACE
@@ -100,9 +98,9 @@ class Sprite:
     def rows(self) -> list[list[Glyph]]:
         """Return the rendered rows for this cell."""
 
-        top = [self.north] * self.WIDTH + [Glyph.CORNER]
-        middle = [self.center] * self.WIDTH + [self.east]
-        bottom = [self.south] * self.WIDTH + [Glyph.CORNER]
+        top = [self.north] * self.width + [Glyph.CORNER]
+        middle = [self.center] * self.width + [self.east]
+        bottom = [self.south] * self.width + [Glyph.CORNER]
 
         x, y = self.location
         if x == 0:
@@ -117,8 +115,7 @@ class Sprite:
 
 
 class Ascii:
-    def __init__(self, renderer: type[Renderer], stdscr: curses.window):
-        self.renderer = renderer
+    def __init__(self, stdscr: curses.window):
         self.stdscr = stdscr
         self.running = True
         self.menu_index = 0
@@ -136,8 +133,8 @@ class Ascii:
         self.show_solution_trigger = True
 
     class Option(StrEnum):
-        SHOW = "Toggle Solution"
         RECREATE = "Recreate"
+        SHOW = "Toggle Solution"
         QUIT = "Quit"
 
     actions = {
@@ -192,7 +189,7 @@ class Ascii:
 
         self.stdscr.refresh()
 
-    def handle_input(self, key: int):
+    def handle_input(self, key: int) -> None:
         if key == curses.KEY_UP:
             self.menu_index -= 1
         elif key == curses.KEY_DOWN:
@@ -202,7 +199,7 @@ class Ascii:
 
         self.menu_index %= len(self.Option)
 
-    def select(self):
+    def select(self) -> None:
         options = list(self.Option)
         option = options[self.menu_index]
         action = self.actions[option]
@@ -219,7 +216,7 @@ class AsciiRenderer(Renderer):
         # stdscr.keypad(True)
         stdscr.timeout(round(1000 / maze.sps))
 
-        ascii_view = Ascii(Renderer, stdscr)
+        ascii_view = Ascii(stdscr)
 
         while ascii_view.regenerate:
             ascii_view.regenerate = False
