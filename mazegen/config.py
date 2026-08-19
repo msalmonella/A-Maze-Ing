@@ -20,8 +20,8 @@ from . import algorithms, solvers, renderers
 class Config(BaseModel):
     """Handles validation for the maze attributes"""
 
-    width: int = Field(ge=2)
-    height: int = Field(ge=2)
+    width: int = Field(ge=1)
+    height: int = Field(ge=1)
     entry: Coordinate
     exit: Coordinate
     output_file: str = Field(min_length=1)
