@@ -1,9 +1,11 @@
 import curses
 from enum import Enum, StrEnum
+from functools import reduce
+from operator import or_
 import mazegen
 from . import Renderer, Colors
-from ..cell import Cell as MazeCell
-from ..models import Path, Direction
+from ..cell import Cell
+from ..models import Direction
 
 
 class Glyph(Enum):
@@ -23,6 +25,8 @@ class Glyph(Enum):
     SOLUTION_PATH = (4, "█")
 
 
+Sprite = list[list[Glyph]]
+
 GLYPH_COLORS: dict[Glyph, Colors] = {
     Glyph.EXIT_POINT: Colors.RED,
     Glyph.ENTRY_POINT: Colors.GREEN,
@@ -37,40 +41,15 @@ class CellSprite:
         self.width = width * 3
         self.height = height
 
-    def along_the_way(self, x: int, y: int, solution: Path) -> bool:
-        for i in solution:
-            if (x, y) == (i.x, i.y):
-                return True
-        return False
-
-    def exit_condition(
-        self, x: int, y: int, maze: mazegen.MazeGenerator
-    ) -> bool:
-        if (x, y) == maze.exit:
-            return True
-        return False
-
-    def entry_condition(
-        self, x: int, y: int, maze: mazegen.MazeGenerator
-    ) -> bool:
-        if (x, y) == maze.entry:
-            return True
-        return False
-
     def sprite(
-        self,
-        cell: MazeCell,
-        maze: mazegen.MazeGenerator,
-        solution: Path,
-        x,
-        y,
-        show_solution: bool,
-    ) -> list[list[Glyph]]:
-        rows: list[list[Glyph]] = []
+        self, cell: Cell, maze: mazegen.MazeGenerator, show_solution: bool
+    ) -> Sprite:
+        rows: Sprite = []
 
         north_glyph = (
             Glyph.WALL if cell.walls[Direction.NORTH].closed else Glyph.SPACE
         )
+
         rows.append([Glyph.WALL] + [north_glyph] * self.width + [Glyph.WALL])
 
         west_glyph = (
@@ -79,16 +58,16 @@ class CellSprite:
         east_glyph = (
             Glyph.WALL if cell.walls[Direction.EAST].closed else Glyph.SPACE
         )
+
         for _ in range(self.height):
-            if self.exit_condition(x, y, maze):
+            if cell.location == maze.exit:
                 mid = Glyph.EXIT_POINT
-            elif self.entry_condition(x, y, maze):
+            elif cell.location == maze.entry:
                 mid = Glyph.ENTRY_POINT
-            elif self.along_the_way(x, y, solution):
-                if show_solution:
-                    mid = Glyph.SOLUTION_PATH
-                else:
-                    mid = Glyph.SPACE
+            elif cell.location in maze.solution and show_solution:
+                mid = Glyph.SOLUTION_PATH
+            elif cell.value == reduce(or_, Direction, Direction(0)):
+                mid = Glyph.WALL
             else:
                 mid = Glyph.SPACE
 
@@ -97,6 +76,7 @@ class CellSprite:
         south_glyph = (
             Glyph.WALL if cell.walls[Direction.SOUTH].closed else Glyph.SPACE
         )
+
         rows.append([Glyph.WALL] + [south_glyph] * self.width + [Glyph.WALL])
 
         return rows
@@ -154,31 +134,16 @@ class Ascii:
             col += len(chunk)
             i = j
 
-    def draw(
-        self,
-        maze: mazegen.MazeGenerator,
-        solution: Path,
-        show_solution: bool,
-    ) -> None:
+    def draw(self, maze: mazegen.MazeGenerator, show_solution: bool) -> None:
         self.stdscr.erase()
         cell_sprite = CellSprite(1, 1)
 
         y = 0
 
-        for y_value in range(maze.height):
-            row_cells = []
-            for x_value in range(maze.width):
-                maze_cell = maze.grid[y_value][x_value]
-                row_cells.append(
-                    cell_sprite.sprite(
-                        maze_cell,
-                        maze,
-                        solution,
-                        x_value,
-                        y_value,
-                        show_solution,
-                    )
-                )
+        for row in maze.grid:
+            row_cells: list[Sprite] = []
+            for cell in row:
+                row_cells.append(cell_sprite.sprite(cell, maze, show_solution))
 
             for line_parts in zip(*row_cells):
                 line: list[Glyph] = []
@@ -251,9 +216,8 @@ class AsciiRenderer(Renderer):
                     except StopIteration:
                         generating = False
 
-                ascii_view.draw(maze, maze.solution, ascii_view.show_solution)
-                key = stdscr.getch()
-                ascii_view.handle_input(key)
+                ascii_view.draw(maze, ascii_view.show_solution)
+                ascii_view.handle_input(stdscr.getch())
 
                 if ascii_view.regenerate:
                     break
