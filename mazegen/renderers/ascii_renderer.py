@@ -2,84 +2,118 @@ import curses
 from enum import Enum, StrEnum
 from functools import reduce
 from operator import or_
+from dataclasses import dataclass
 import mazegen
 from . import Renderer, Colors
 from ..cell import Cell
-from ..models import Direction
+from ..models import Direction, Coordinate
 
 
 class Glyph(Enum):
+    SPACE = (" ", 0)
+    CORNER = ("•", 1)
 
-    char: str
+    HORIZONTAL = ("━", 2)
+    VERTICAL = ("┃", 3)
 
-    def __new__(cls, glyph_id: int, char: str):
-        obj = object.__new__(cls)
-        obj._value_ = glyph_id
-        obj.char = char
-        return obj
+    ENTRY = ("█", 4)
+    EXIT = ("█", 5)
 
-    SPACE = (0, " ")
-    WALL = (1, "█")
-    EXIT_POINT = (2, "█")
-    ENTRY_POINT = (3, "█")
-    SOLUTION_PATH = (4, "█")
+    SOLUTION = ("█", 6)
+    PATTERN = ("█", 7)
 
-
-Sprite = list[list[Glyph]]
-
-GLYPH_COLORS: dict[Glyph, Colors] = {
-    Glyph.EXIT_POINT: Colors.RED,
-    Glyph.ENTRY_POINT: Colors.GREEN,
-    Glyph.SOLUTION_PATH: Colors.YELLOW,
-}
+    @property
+    def color(self) -> Colors | None:
+        return {
+            Glyph.EXIT: Colors.RED,
+            Glyph.ENTRY: Colors.GREEN,
+            Glyph.SOLUTION: Colors.YELLOW,
+        }.get(self)
 
 
-class CellSprite:
-    """Renders a single maze cell's sprite, respecting open/closed walls."""
+@dataclass(frozen=True)
+class Sprite:
+    """The representation of a single maze cell."""
 
-    def __init__(self, width: int = 1, height: int = 1):
-        self.width = width * 3
-        self.height = height
+    north: Glyph
+    west: Glyph
+    south: Glyph
+    east: Glyph
+    center: Glyph
 
-    def sprite(
-        self, cell: Cell, maze: mazegen.MazeGenerator, show_solution: bool
-    ) -> Sprite:
-        rows: Sprite = []
+    location: Coordinate
 
-        north_glyph = (
-            Glyph.WALL if cell.walls[Direction.NORTH].closed else Glyph.SPACE
+    WIDTH: int = 4
+
+    @classmethod
+    def from_cell(
+        cls,
+        cell: Cell,
+        maze: mazegen.MazeGenerator,
+        show_solution: bool,
+    ) -> "Sprite":
+        return cls(
+            north=(
+                Glyph.HORIZONTAL
+                if cell.walls[Direction.NORTH].closed
+                else Glyph.SPACE
+            ),
+            west=(
+                Glyph.VERTICAL
+                if cell.walls[Direction.WEST].closed
+                else Glyph.SPACE
+            ),
+            south=(
+                Glyph.HORIZONTAL
+                if cell.walls[Direction.SOUTH].closed
+                else Glyph.SPACE
+            ),
+            east=(
+                Glyph.VERTICAL
+                if cell.walls[Direction.EAST].closed
+                else Glyph.SPACE
+            ),
+            center=cls._center(cell, maze, show_solution),
+            location=cell.location,
         )
 
-        rows.append([Glyph.WALL] + [north_glyph] * self.width + [Glyph.WALL])
+    @staticmethod
+    def _center(
+        cell: Cell,
+        maze: mazegen.MazeGenerator,
+        show_solution: bool,
+    ) -> Glyph:
+        if cell.location == maze.exit:
+            return Glyph.EXIT
 
-        west_glyph = (
-            Glyph.WALL if cell.walls[Direction.WEST].closed else Glyph.SPACE
-        )
-        east_glyph = (
-            Glyph.WALL if cell.walls[Direction.EAST].closed else Glyph.SPACE
-        )
+        if cell.location == maze.entry:
+            return Glyph.ENTRY
 
-        for _ in range(self.height):
-            if cell.location == maze.exit:
-                mid = Glyph.EXIT_POINT
-            elif cell.location == maze.entry:
-                mid = Glyph.ENTRY_POINT
-            elif cell.location in maze.solution and show_solution:
-                mid = Glyph.SOLUTION_PATH
-            elif cell.value == reduce(or_, Direction, Direction(0)):
-                mid = Glyph.WALL
-            else:
-                mid = Glyph.SPACE
+        if show_solution and cell.location in maze.solution:
+            return Glyph.SOLUTION
 
-            rows.append([west_glyph] + [mid] * self.width + [east_glyph])
+        if cell.value == reduce(or_, Direction, Direction(0)):
+            return Glyph.PATTERN
 
-        south_glyph = (
-            Glyph.WALL if cell.walls[Direction.SOUTH].closed else Glyph.SPACE
-        )
+        return Glyph.SPACE
 
-        rows.append([Glyph.WALL] + [south_glyph] * self.width + [Glyph.WALL])
+    def rows(self) -> list[list[Glyph]]:
+        """Return the rendered rows for this cell."""
 
-        return rows
+        top = [self.north] * self.WIDTH + [Glyph.CORNER]
+        middle = [self.center] * self.WIDTH + [self.east]
+        bottom = [self.south] * self.WIDTH + [Glyph.CORNER]
+
+        x, y = self.location
+        if x == 0:
+            top = [Glyph.CORNER] + top
+            middle = [self.west] + middle
+            bottom = [Glyph.CORNER] + bottom
+
+        if y == 0:
+            return [top, middle, bottom]
+
+        return [middle, bottom]
 
 
 class Ascii:
@@ -112,47 +146,34 @@ class Ascii:
         Option.SHOW: on_show,
     }
 
-    def _draw_line(self, y: int, x: int, glyphs: list[Glyph]) -> None:
-        stdscr = self.stdscr
-        col = x
-        i = 0
-        n = len(glyphs)
-        while i < n:
-            member = glyphs[i]
-            color = GLYPH_COLORS.get(member)
-            j = i + 1
-            while j < n and glyphs[j] is member:
-                j += 1
-            chunk = member.char * (j - i)
-            try:
-                if color is not None:
-                    stdscr.addstr(y, col, chunk, color.pair)
-                else:
-                    stdscr.addstr(y, col, chunk)
-            except curses.error:
-                pass
-            col += len(chunk)
-            i = j
+    def _draw_glyph(self, y: int, x: int, glyph: Glyph) -> None:
+        if glyph.color is None:
+            self.stdscr.addch(y, x, glyph.value[0])
+        else:
+            self.stdscr.addch(y, x, glyph.value[0], glyph.color.pair)
+
+    def _draw_row(self, y: int, sprites: list[Sprite], row: int) -> None:
+        x = 0
+
+        for sprite in sprites:
+            for glyph in sprite.rows()[row]:
+                self._draw_glyph(y, x, glyph)
+                x += 1
 
     def draw(self, maze: mazegen.MazeGenerator, show_solution: bool) -> None:
         self.stdscr.erase()
-        cell_sprite = CellSprite(1, 1)
+
+        sprites = [
+            [Sprite.from_cell(cell, maze, show_solution) for cell in row]
+            for row in maze.grid
+        ]
 
         y = 0
-
-        for row in maze.grid:
-            row_cells: list[Sprite] = []
-            for cell in row:
-                row_cells.append(cell_sprite.sprite(cell, maze, show_solution))
-
-            for line_parts in zip(*row_cells):
-                line: list[Glyph] = []
-                for part in line_parts:
-                    line.extend(part)
-                self._draw_line(y, 0, line)
+        for sprite_row in sprites:
+            for row in range(len(sprite_row[0].rows())):
+                self._draw_row(y, sprite_row, row)
                 y += 1
 
-        # draw the menu underneath
         y += 1
 
         options = list(self.Option)
@@ -163,6 +184,7 @@ class Ascii:
                 if option == self.Option.SHOW
                 else ""
             )
+
             try:
                 self.stdscr.addstr(y + i, 0, prefix + option + suffix)
             except curses.error:
