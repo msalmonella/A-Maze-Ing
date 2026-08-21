@@ -144,10 +144,13 @@ class Ascii:
     }
 
     def _draw_glyph(self, y: int, x: int, glyph: Glyph) -> None:
-        if glyph.color is None:
-            self.stdscr.addch(y, x, glyph.value[0])
-        else:
-            self.stdscr.addch(y, x, glyph.value[0], glyph.color.pair)
+        try:
+            if glyph.color is None:
+                self.stdscr.addch(y, x, glyph.value[0])
+            else:
+                self.stdscr.addch(y, x, glyph.value[0], glyph.color.pair)
+        except curses.error:
+            pass
 
     def _draw_row(self, y: int, sprites: list[Sprite], row: int) -> None:
         x = 0
