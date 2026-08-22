@@ -24,6 +24,8 @@ class Glyph(Enum):
     @property
     def color(self) -> Colors | None:
         return {
+            Glyph.HORIZONTAL: Colors.RED,
+            Glyph.VERTICAL: Colors.RED,
             Glyph.EXIT: Colors.RED,
             Glyph.ENTRY: Colors.GREEN,
             Glyph.SOLUTION: Colors.YELLOW,
@@ -115,6 +117,8 @@ class Sprite:
 
 
 class Ascii:
+    WALL_GLYPHS = (Glyph.HORIZONTAL, Glyph.VERTICAL)
+
     def __init__(self, stdscr: curses.window):
         self.stdscr = stdscr
         self.running = True
@@ -122,6 +126,20 @@ class Ascii:
         self.regenerate = True
         self.show_solution = False
         self.show_solution_trigger = False
+        self.colorcurser = 0
+
+    @property
+    def wall_color(self) -> Colors:
+        palette = list(Colors)
+        return palette[self.colorcurser % len(palette)]
+
+    def _resolve_color(self, glyph: Glyph) -> Colors | None:
+        if glyph in self.WALL_GLYPHS:
+            return self.wall_color
+        return glyph.color
+
+    def on_colorchange(self) -> None:
+        self.colorcurser += 1
 
     def on_quit(self) -> None:
         self.running = False
@@ -135,20 +153,23 @@ class Ascii:
     class Option(StrEnum):
         RECREATE = "Recreate"
         SHOW = "Toggle Solution"
+        CHANGE_COLOR = "Change Colorscheme"
         QUIT = "Quit"
 
     actions = {
+        Option.CHANGE_COLOR: on_colorchange,
         Option.QUIT: on_quit,
         Option.RECREATE: on_regen,
         Option.SHOW: on_show,
     }
 
     def _draw_glyph(self, y: int, x: int, glyph: Glyph) -> None:
+        color = self._resolve_color(glyph)
         try:
-            if glyph.color is None:
+            if color is None:
                 self.stdscr.addch(y, x, glyph.value[0])
             else:
-                self.stdscr.addch(y, x, glyph.value[0], glyph.color.pair)
+                self.stdscr.addch(y, x, glyph.value[0], color.pair)
         except curses.error:
             pass
 
@@ -179,11 +200,13 @@ class Ascii:
         options = list(self.Option)
         for i, option in enumerate(options):
             prefix = "> " if i == self.menu_index else "  "
-            suffix = (
-                ": " + ("Hidden", "Visible")[self.show_solution]
-                if option == self.Option.SHOW
-                else ""
-            )
+
+            if option == self.Option.SHOW:
+                suffix = ": " + ("Hidden", "Visible")[self.show_solution]
+            elif option == self.Option.CHANGE_COLOR:
+                suffix = ": " + self.wall_color.name
+            else:
+                suffix = ""
 
             try:
                 self.stdscr.addstr(y + i, 0, prefix + option + suffix)
