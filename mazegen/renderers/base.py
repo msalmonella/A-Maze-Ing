@@ -18,13 +18,13 @@ class Colors(IntEnum):
         self.fg = fg
         self.bg = bg
 
-    RED     = (1, curses.COLOR_RED)
-    GREEN   = (2, curses.COLOR_GREEN)
-    BLUE    = (3, curses.COLOR_BLUE)
-    YELLOW  = (4, curses.COLOR_YELLOW)
-    CYAN    = (5, curses.COLOR_CYAN)
-    MAGENTA = (6, curses.COLOR_MAGENTA)
-    WHITE   = (7, curses.COLOR_WHITE)
+    WHITE   = (1, curses.COLOR_WHITE)
+    RED     = (2, curses.COLOR_RED)
+    GREEN   = (3, curses.COLOR_GREEN)
+    BLUE    = (4, curses.COLOR_BLUE)
+    YELLOW  = (5, curses.COLOR_YELLOW)
+    CYAN    = (6, curses.COLOR_CYAN)
+    MAGENTA = (7, curses.COLOR_MAGENTA)
 
     @classmethod
     def init_pairs(cls) -> None:
