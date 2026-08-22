@@ -24,8 +24,8 @@ class Glyph(Enum):
     @property
     def color(self) -> Colors | None:
         return {
-            Glyph.HORIZONTAL: Colors.RED,
-            Glyph.VERTICAL: Colors.RED,
+            Glyph.HORIZONTAL: Colors.WHITE,
+            Glyph.VERTICAL: Colors.WHITE,
             Glyph.EXIT: Colors.RED,
             Glyph.ENTRY: Colors.GREEN,
             Glyph.SOLUTION: Colors.YELLOW,
