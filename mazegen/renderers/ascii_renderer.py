@@ -53,29 +53,38 @@ class Sprite:
         show_solution: bool,
     ) -> "Sprite":
         return cls(
-            north=(
-                Glyph.HORIZONTAL
-                if cell.walls[Direction.NORTH].closed
-                else Glyph.SPACE
-            ),
-            west=(
-                Glyph.VERTICAL
-                if cell.walls[Direction.WEST].closed
-                else Glyph.SPACE
-            ),
-            south=(
-                Glyph.HORIZONTAL
-                if cell.walls[Direction.SOUTH].closed
-                else Glyph.SPACE
-            ),
-            east=(
-                Glyph.VERTICAL
-                if cell.walls[Direction.EAST].closed
-                else Glyph.SPACE
-            ),
+            north=cls._walls(cell, maze, show_solution, Direction.NORTH),
+            west=cls._walls(cell, maze, show_solution, Direction.WEST),
+            south=cls._walls(cell, maze, show_solution, Direction.SOUTH),
+            east=cls._walls(cell, maze, show_solution, Direction.EAST),
             center=cls._center(cell, maze, show_solution),
             location=cell.location,
         )
+
+    @staticmethod
+    def _walls(
+        cell: Cell,
+        maze: mazegen.MazeGenerator,
+        show_solution: bool,
+        direction: Direction,
+    ) -> Glyph:
+        glyphs = {
+            Direction.NORTH: Glyph.HORIZONTAL,
+            Direction.WEST: Glyph.VERTICAL,
+            Direction.SOUTH: Glyph.HORIZONTAL,
+            Direction.EAST: Glyph.VERTICAL,
+        }
+
+        if cell.walls[direction].closed:
+            return glyphs[direction]
+
+        if (
+            show_solution
+            and cell.location in maze.solution
+            and cell.neighbor(direction) in maze.solution
+        ):
+            return Glyph.SOLUTION
+        return Glyph.SPACE
 
     @staticmethod
     def _center(
