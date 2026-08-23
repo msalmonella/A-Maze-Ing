@@ -279,4 +279,8 @@ class AsciiRenderer(Renderer):
                 ascii_view.handle_input(stdscr.getch())
 
                 if ascii_view.regenerate:
-                    break
+                    try:
+                        while True:
+                            next(generation)
+                    except StopIteration:
+                        break
