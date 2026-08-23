@@ -126,12 +126,12 @@ class Ascii:
         self.regenerate = True
         self.show_solution = False
         self.show_solution_trigger = False
-        self.colorcurser = 0
+        self.color_cursor = 0
 
     @property
     def wall_color(self) -> Colors:
         palette = list(Colors)
-        return palette[self.colorcurser % len(palette)]
+        return palette[self.color_cursor % len(palette)]
 
     def _resolve_color(self, glyph: Glyph) -> Colors | None:
         if glyph in self.WALL_GLYPHS:
@@ -139,7 +139,7 @@ class Ascii:
         return glyph.color
 
     def on_colorchange(self) -> None:
-        self.colorcurser += 1
+        self.color_cursor += 1
 
     def on_quit(self) -> None:
         self.running = False
@@ -153,7 +153,7 @@ class Ascii:
     class Option(StrEnum):
         RECREATE = "Recreate"
         SHOW = "Toggle Solution"
-        CHANGE_COLOR = "Change Colorscheme"
+        CHANGE_COLOR = "Change Wall Color"
         QUIT = "Quit"
 
     actions = {
