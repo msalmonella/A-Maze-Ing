@@ -125,7 +125,6 @@ class Ascii:
         self.menu_index = 0
         self.regenerate = True
         self.show_solution = False
-        self.show_solution_trigger = False
         self.color_cursor = 0
 
     @property
@@ -148,7 +147,7 @@ class Ascii:
         self.regenerate = True
 
     def on_show(self) -> None:
-        self.show_solution_trigger = True
+        self.show_solution = not self.show_solution
 
     class Option(StrEnum):
         RECREATE = "Recreate"
@@ -250,10 +249,7 @@ class AsciiRenderer(Renderer):
             generating = True
 
             while ascii_view.running:
-                if ascii_view.show_solution_trigger:
-                    ascii_view.show_solution = not ascii_view.show_solution
-                    ascii_view.show_solution_trigger = False
-                    # stdscr.clear()
+                # stdscr.clear()
 
                 if generating:
                     try:
