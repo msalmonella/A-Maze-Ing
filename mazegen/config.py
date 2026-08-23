@@ -28,7 +28,7 @@ class Config(BaseModel):
     perfect: bool
 
     seed: str = Field(default="")
-    sps: int = Field(default=24, ge=1)
+    sps: int = Field(default=24, ge=0)
     algorithm: type[Algorithm] = Field(default=MazerTheMiner)
     solver: type[Solver] = Field(default=BFS)
     renderer: type[Renderer] = Field(default=AsciiRenderer)

@@ -1,4 +1,5 @@
 import curses
+import time
 from enum import Enum, StrEnum
 from functools import reduce
 from dataclasses import dataclass
@@ -248,7 +249,7 @@ class AsciiRenderer(Renderer):
         Colors.init_pairs()
         curses.curs_set(0)
         # stdscr.keypad(True)
-        stdscr.timeout(round(1000 / maze.sps))
+        stdscr.timeout(0)
 
         ascii_view = Ascii(stdscr)
 
@@ -257,12 +258,20 @@ class AsciiRenderer(Renderer):
             generation = maze.generate()
             generating = True
 
-            while ascii_view.running:
-                # stdscr.clear()
+            step_delay = 1 / maze.sps if maze.sps else 0
+            last_step = time.monotonic()
 
-                if generating:
+            while ascii_view.running:
+                now = time.monotonic()
+
+                if generating and now - last_step >= step_delay:
                     try:
-                        next(generation)
+                        if step_delay == 0:
+                            while True:
+                                next(generation)
+                        else:
+                            next(generation)
+                        last_step = now
                     except StopIteration:
                         generating = False
 
