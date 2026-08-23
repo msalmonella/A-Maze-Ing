@@ -91,7 +91,7 @@ class MazeGenerator:
         exit_x, exit_y = self.exit
 
         with open(self.output_file, "w") as f:
-            print(self.output_file)
+            # print(self.output_file)
             for row in self.grid:
                 line = ""
                 for cell in row:
