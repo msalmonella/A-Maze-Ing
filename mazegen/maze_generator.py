@@ -75,7 +75,9 @@ class MazeGenerator:
         for row in self.grid:
             for cell in row:
                 if cell.value.bit_count() == 3:
-                    for _, wall in cell.walls.items():
+                    walls = list(cell.walls.values())
+                    shifted = walls[1:] + walls[:1]
+                    for wall in shifted:
                         if wall.closed:
                             try:
                                 wall.closed = False
