@@ -257,11 +257,24 @@ class AsciiRenderer(Renderer):
             ascii_view.regenerate = False
             generation = maze.generate()
             generating = True
+            try:
+                next(generation)
+            except StopIteration:
+                generating = False
 
             step_delay = 1 / maze.sps if maze.sps else 0
             last_step = time.monotonic()
 
             while ascii_view.running:
+                ascii_view.handle_input(stdscr.getch())
+
+                if ascii_view.regenerate:
+                    try:
+                        while True:
+                            next(generation)
+                    except StopIteration:
+                        break
+
                 now = time.monotonic()
 
                 if generating and now - last_step >= step_delay:
@@ -276,11 +289,3 @@ class AsciiRenderer(Renderer):
                         generating = False
 
                 ascii_view.draw(maze, ascii_view.show_solution)
-                ascii_view.handle_input(stdscr.getch())
-
-                if ascii_view.regenerate:
-                    try:
-                        while True:
-                            next(generation)
-                    except StopIteration:
-                        break
