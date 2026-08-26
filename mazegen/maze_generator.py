@@ -1,6 +1,6 @@
 from random import Random
 from collections.abc import Generator
-from .cell import Cell
+from .cell import Cell, Grid
 from .models import Path, Coordinate, Direction
 from .errors import PatternError, LockedWallError
 
@@ -14,8 +14,6 @@ PATTERN_42 = [
     "         ",
 ]
 
-Grid = list[list[Cell]]
-
 
 class MazeGenerator:
     grid: Grid
@@ -27,18 +25,11 @@ class MazeGenerator:
 
         cfg = parse_config(config_path)
 
-        self.width = cfg.width
-        self.height = cfg.height
-        self.entry = cfg.entry
-        self.exit = cfg.exit
-        self.output_file = cfg.output_file
-        self.perfect = cfg.perfect
+        self.config = cfg.mandatory
+        self.operations = cfg.operations
 
         self.seed = cfg.seed
         self.sps = cfg.sps
-        self.algorithm = cfg.algorithm()
-        self.solver = cfg.solver()
-        self.renderer = cfg.renderer()
 
         self._rng.seed(self.seed if self.seed else None)
         self.grid = self._initialize_grid()
@@ -53,23 +44,23 @@ class MazeGenerator:
         return self._solution
 
     def render(self) -> None:
-        self.renderer(self)
+        self.operations.renderer(self)
 
     def generate(self) -> Generator[None, None, None]:
         self._solution = []
         self.grid = self._initialize_grid()
 
-        yield from self.algorithm(self, self._rng)
-        if not self.perfect:
+        yield from self.operations.algorithm(self.grid, self.config, self._rng)
+        if not self.config.perfect:
             yield from self._non_perfect()
 
-        self._solution = self.solver(self)
+        self._solution = self.operations.solver(self.grid, self.config)
         self._hex_writer(self.solution)
 
     def pattern_can_fit(self) -> bool:
-        return self.height >= len(PATTERN_42) and self.width >= len(
-            PATTERN_42[0]
-        )
+        return self.config.height >= len(
+            PATTERN_42
+        ) and self.config.width >= len(PATTERN_42[0])
 
     def _non_perfect(self) -> Generator[None]:
         for row in self.grid:
@@ -89,10 +80,11 @@ class MazeGenerator:
 
     def _hex_writer(self, solution: Path) -> None:
         """writes in text format"""
-        entry_x, entry_y = self.entry
-        exit_x, exit_y = self.exit
+        config = self.config
+        entry_x, entry_y = config.entry
+        exit_x, exit_y = config.exit
 
-        with open(self.output_file, "w") as f:
+        with open(config.output_file, "w") as f:
             # print(self.output_file)
             for row in self.grid:
                 line = ""
@@ -105,7 +97,8 @@ class MazeGenerator:
             f.write(f"{exit_x},{exit_y}\n")
             f.write(f"{"".join(self._nesw_conversion(solution))}")
 
-    def _nesw_conversion(self, path: Path) -> list[str]:
+    @staticmethod
+    def _nesw_conversion(path: Path) -> list[str]:
         """Converts to NESW text format"""
         nesw: list[str] = []
         for i in range(len(path) - 1):
@@ -131,6 +124,7 @@ class MazeGenerator:
 
     def _place_pattern_42(self, grid: Grid) -> Grid:
         """Places permanent 42 pattern if fits into the grid"""
+        config = self.config
 
         if not self.pattern_can_fit():
             return grid
@@ -138,14 +132,14 @@ class MazeGenerator:
         to_be_locked: list[Coordinate] = []
 
         for y, line in enumerate(PATTERN_42):
-            offset_y = (self.height - len(PATTERN_42)) // 2
-            offset_x = (self.width - len(line)) // 2
+            offset_y = (config.height - len(PATTERN_42)) // 2
+            offset_x = (config.width - len(line)) // 2
 
             for x, char in enumerate(line):
                 if char == "X":
                     coord = Coordinate(x + offset_x, y + offset_y)
                     to_be_locked.append(coord)
-                    if coord == self.entry or coord == self.exit:
+                    if coord == config.entry or coord == config.exit:
                         raise PatternError(
                             "Cannot place 42 pattern on entry or exit points"
                         )
@@ -158,10 +152,10 @@ class MazeGenerator:
         """Generate the initial maze grid with shared closed walls."""
         grid: Grid = []
 
-        for row in range(self.height):
+        for row in range(self.config.height):
             grid.append([])
 
-            for column in range(self.width):
+            for column in range(self.config.width):
                 wall_above = (
                     grid[row - 1][column].walls[Direction.SOUTH]
                     if row

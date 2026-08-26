@@ -82,3 +82,6 @@ class Cell:
         x, y = self.location
 
         return Coordinate(x + dx, y + dy)
+
+
+Grid = list[list[Cell]]

@@ -6,7 +6,8 @@ from dataclasses import dataclass
 import mazegen
 from . import Renderer, Colors
 from ..cell import Cell
-from ..models import Direction, Coordinate
+from ..models import Direction, Coordinate, Path
+from ..models import Mandatory
 
 
 class Glyph(Enum):
@@ -50,22 +51,23 @@ class Sprite:
     def from_cell(
         cls,
         cell: Cell,
-        maze: mazegen.MazeGenerator,
+        config: Mandatory,
+        solution: Path,
         show_solution: bool,
     ) -> "Sprite":
         return cls(
-            north=cls._walls(cell, maze, show_solution, Direction.NORTH),
-            west=cls._walls(cell, maze, show_solution, Direction.WEST),
-            south=cls._walls(cell, maze, show_solution, Direction.SOUTH),
-            east=cls._walls(cell, maze, show_solution, Direction.EAST),
-            center=cls._center(cell, maze, show_solution),
+            north=cls._walls(cell, solution, show_solution, Direction.NORTH),
+            west=cls._walls(cell, solution, show_solution, Direction.WEST),
+            south=cls._walls(cell, solution, show_solution, Direction.SOUTH),
+            east=cls._walls(cell, solution, show_solution, Direction.EAST),
+            center=cls._center(cell, config, solution, show_solution),
             location=cell.location,
         )
 
     @staticmethod
     def _walls(
         cell: Cell,
-        maze: mazegen.MazeGenerator,
+        solution: Path,
         show_solution: bool,
         direction: Direction,
     ) -> Glyph:
@@ -81,8 +83,8 @@ class Sprite:
 
         if (
             show_solution
-            and cell.location in maze.solution
-            and cell.neighbor(direction) in maze.solution
+            and cell.location in solution
+            and cell.neighbor(direction) in solution
         ):
             return Glyph.SOLUTION
         return Glyph.SPACE
@@ -90,16 +92,17 @@ class Sprite:
     @staticmethod
     def _center(
         cell: Cell,
-        maze: mazegen.MazeGenerator,
+        config: Mandatory,
+        solution: Path,
         show_solution: bool,
     ) -> Glyph:
-        if cell.location == maze.exit:
+        if cell.location == config.exit:
             return Glyph.EXIT
 
-        if cell.location == maze.entry:
+        if cell.location == config.entry:
             return Glyph.ENTRY
 
-        if show_solution and cell.location in maze.solution:
+        if show_solution and cell.location in solution:
             return Glyph.SOLUTION
 
         if cell.value == reduce(lambda a, b: a | b, Direction, Direction(0)):
@@ -194,7 +197,12 @@ class Ascii:
         self.stdscr.erase()
 
         sprites = [
-            [Sprite.from_cell(cell, maze, show_solution) for cell in row]
+            [
+                Sprite.from_cell(
+                    cell, maze.config, maze.solution, show_solution
+                )
+                for cell in row
+            ]
             for row in maze.grid
         ]
 

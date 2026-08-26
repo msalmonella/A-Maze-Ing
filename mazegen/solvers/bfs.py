@@ -1,17 +1,18 @@
-import mazegen
 from . import Solver
 from ..models import Coordinate, Path, Direction
+from ..cell import Grid
+from ..models import Mandatory
 
 
 class BFS(Solver):
     """BFS"""
 
-    def __call__(self, maze: mazegen.MazeGenerator) -> Path:
+    def __call__(self, grid: Grid, config: Mandatory) -> Path:
         path: Path = []
-        node: Coordinate | None = maze.exit
-        queue: Path = [maze.entry]
-        visited: set[Coordinate] = {maze.entry}
-        came_from: dict[Coordinate, Coordinate | None] = {maze.entry: None}
+        node: Coordinate | None = config.exit
+        queue: Path = [config.entry]
+        visited: set[Coordinate] = {config.entry}
+        came_from: dict[Coordinate, Coordinate | None] = {config.entry: None}
 
         def qvc_appender(
             current_pos: Coordinate, queue_pos: Coordinate
@@ -23,11 +24,11 @@ class BFS(Solver):
 
         while queue:
             current = queue.pop(0)
-            if current == maze.exit:
+            if current == config.exit:
                 break
 
             x, y = current
-            cell = maze.grid[y][x]
+            cell = grid[y][x]
 
             for direction in Direction:
                 if not cell.walls[direction].closed:

@@ -1,23 +1,24 @@
 import sys
 from random import Random
 from collections.abc import Generator
-import mazegen
 from . import Algorithm
 from ..models import Coordinate, Direction
 from ..errors import LockedWallError
+from ..cell import Grid
+from ..models import Mandatory
 
 
 class MazerTheMiner(Algorithm):
 
     def __call__(
-        self, maze: mazegen.MazeGenerator, rng: Random
+        self, grid: Grid, config: Mandatory, rng: Random
     ) -> Generator[None]:
-        self._apply_recursion_limit(maze.width, maze.height)
-        return self.mazer_the_miner(maze, rng, Coordinate(0, 0), set())
+        self._apply_recursion_limit(config.width, config.height)
+        return self.mazer_the_miner(grid, rng, Coordinate(0, 0), set())
 
     def mazer_the_miner(
         self,
-        maze: mazegen.MazeGenerator,
+        grid: Grid,
         rng: Random,
         head: Coordinate,
         processed: set[Coordinate],
@@ -25,7 +26,7 @@ class MazerTheMiner(Algorithm):
         """Recursive function to create maze by digging into walls"""
 
         x, y = head
-        cell = maze.grid[y][x]
+        cell = grid[y][x]
         processed.add(head)
 
         directions = list(Direction)
@@ -43,7 +44,7 @@ class MazerTheMiner(Algorithm):
                     continue
 
                 yield from self.mazer_the_miner(
-                    maze, rng, next_index, processed
+                    grid, rng, next_index, processed
                 )
 
     @staticmethod

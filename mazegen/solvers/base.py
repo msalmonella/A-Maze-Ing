@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-import mazegen
 from ..models import Path
+from ..cell import Grid
+from ..models import Mandatory
 
 
 class Solver(ABC):
 
     @abstractmethod
-    def __call__(self, maze: mazegen.MazeGenerator) -> Path:
+    def __call__(self, grid: Grid, config: Mandatory) -> Path:
         pass

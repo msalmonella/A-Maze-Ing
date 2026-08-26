@@ -1,32 +1,33 @@
 from random import Random
 from collections.abc import Generator
-import mazegen
 from . import Algorithm
-from ..cell import Wall
+from ..cell import Wall, Grid
 from ..models import Coordinate
+from ..models import Mandatory
 
 
 class Prim(Algorithm):
     """Generates a maze using randomized Prim's algorithm."""
 
     def __call__(
-        self, maze: mazegen.MazeGenerator, rng: Random
+        self, grid: Grid, config: Mandatory, rng: Random
     ) -> Generator[None]:
-        return self.prim(maze, rng)
+        return self.prim(grid, config, rng)
 
     def prim(
         self,
-        maze: mazegen.MazeGenerator,
+        grid: Grid,
+        config: Mandatory,
         rng: Random,
     ) -> Generator[None]:
         """Function to create maze by Prim's minimal spanning tree algorithm"""
 
         frontiers: list[tuple[Wall, Coordinate]] = []
-        visited: set[Coordinate] = {maze.entry}
+        visited: set[Coordinate] = {config.entry}
 
         def add_frontiers(coord: Coordinate) -> None:
             x, y = coord
-            cell = maze.grid[y][x]
+            cell = grid[y][x]
 
             for direction, wall in cell.walls.items():
                 if not wall.locked:
@@ -34,7 +35,7 @@ class Prim(Algorithm):
                     if next_cell not in visited:
                         frontiers.append((wall, next_cell))
 
-        add_frontiers(maze.entry)
+        add_frontiers(config.entry)
 
         while frontiers:
             frontier, coord = frontiers.pop(rng.randrange(len(frontiers)))
