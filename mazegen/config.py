@@ -1,4 +1,5 @@
 from types import ModuleType
+from typing import cast
 from pydantic import (
     BaseModel,
     Field,
@@ -40,7 +41,7 @@ class Operations(BaseModel):
         module = modules[info.field_name]
 
         try:
-            return getattr(module, value)()
+            return cast(ModuleType, getattr(module, value)())
         except AttributeError as e:
             raise PydanticCustomError(
                 "module_not_found",
