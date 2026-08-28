@@ -9,8 +9,8 @@ OUTPUT_FILE=maze.txt
 PERFECT=False
 
 ## Optional
-SEED=no_need
+#SEED=no_need
 #ALGORITHM=Prim
 #SOLVER=BFS
-RENDERER=AsciiRenderer
+#RENDERER=AsciiRenderer
 #SPS=24
