@@ -1,11 +1,12 @@
 import curses
 from abc import ABC, abstractmethod
 from enum import IntEnum
+from typing import Self
 import mazegen
 
 
 class Colors(IntEnum):
-    def __new__(cls, pair_id: int, fg: int, bg: int = -1) -> Colors:
+    def __new__(cls, pair_id: int, fg: int, bg: int = -1) -> Self:
         obj = int.__new__(cls, pair_id)
         obj._value_ = pair_id
         return obj
