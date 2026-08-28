@@ -10,7 +10,9 @@ PERFECT=False
 
 ## Optional
 #SEED=no_need
-#ALGORITHM=Prim
+#SPS=24
+
+### Operations
+#ALGORITHM=MazerTheMiner
 #SOLVER=BFS
 #RENDERER=AsciiRenderer
-#SPS=24
