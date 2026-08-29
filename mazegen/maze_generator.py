@@ -1,3 +1,9 @@
+"""Maze generation and solution utilities.
+
+This module provides the ``MazeGenerator`` class for creating, modifying,
+solving, rendering, and exporting mazes based on a configuration file.
+"""
+
 from random import Random
 from collections.abc import Generator
 from .cell import Cell, Grid
@@ -16,11 +22,19 @@ PATTERN_42 = [
 
 
 class MazeGenerator:
+    """Generates, solves, and renders a maze."""
+
     grid: Grid
     _solution: Path = []
     _rng = Random()
 
     def __init__(self, config_path: str):
+        """Initializes the maze generator from a configuration file.
+
+        Args:
+            config_path: Path to the maze configuration file.
+        """
+
         from .config import parse_config
 
         cfg = parse_config(config_path)
@@ -41,12 +55,28 @@ class MazeGenerator:
 
     @property
     def solution(self) -> Path:
+        """Returns the solution path.
+
+        Returns:
+            The `Path` from the maze entry to the exit.
+        """
+
         return self._solution
 
     def render(self) -> None:
+        """Renders the current maze with the configured renderer."""
         self.operations.renderer(self)
 
     def generate(self) -> Generator[None, None, None]:
+        """Generates and solves the maze.
+
+        Yields:
+            None: After each generation step that produces an update.
+
+        Returns:
+            None: When maze generation is complete.
+        """
+
         self._solution = []
         self.grid = self._initialize_grid()
 
@@ -58,11 +88,26 @@ class MazeGenerator:
         self._hex_writer(self.solution)
 
     def pattern_can_fit(self) -> bool:
+        """Checks whether the 42 pattern fits inside the grid.
+
+        Returns:
+            bool: `True` if the pattern fits, otherwise `False`.
+        """
+
         return self.config.height >= len(
             PATTERN_42
         ) and self.config.width >= len(PATTERN_42[0])
 
     def _non_perfect(self) -> Generator[None]:
+        """Opens additional walls to create a non-perfect maze.
+
+        Yields:
+            None: Each time an additional wall is successfully opened.
+
+        Returns:
+            None: When no more walls are opened.
+        """
+
         for row in self.grid:
             for cell in row:
                 if cell.value.bit_count() == 3:
@@ -79,12 +124,17 @@ class MazeGenerator:
                                 break
 
     def _hex_writer(self, solution: Path) -> None:
-        """writes in text format"""
+        """Writes the maze and solution to the configured output file.
+
+        Args:
+            solution (Path): Path containing the solution coordinates.
+        """
+
         config = self.config
         entry_x, entry_y = config.entry
         exit_x, exit_y = config.exit
 
-        with open(config.output_file, "w") as f:
+        with open(config.output_file, "w", encoding="utf-8") as f:
             # print(self.output_file)
             for row in self.grid:
                 line = ""
@@ -99,7 +149,15 @@ class MazeGenerator:
 
     @staticmethod
     def _nesw_conversion(path: Path) -> list[str]:
-        """Converts to NESW text format"""
+        """Converts a coordinate path into their 'NESW' representations.
+
+        Args:
+            path (Path): `Coordinate` sequence of the solution path.
+
+        Returns:
+            list[str]: A list of directions using N, E, S, and W.
+        """
+
         nesw: list[str] = []
         for i in range(len(path) - 1):
             current = path[i]
@@ -123,7 +181,20 @@ class MazeGenerator:
         return nesw
 
     def _place_pattern_42(self, grid: Grid) -> Grid:
-        """Places permanent 42 pattern if fits into the grid"""
+        """Places the permanent 42 pattern in the center of the grid.
+
+        Ommits the pattern without raising an error if it does not fit
+
+        Args:
+            grid (Grid): Grid where the pattern should be placed.
+
+        Returns:
+            Grid: The grid with the 42 pattern cells locked.
+
+        Raises:
+            PatternError: If the pattern overlaps the entry or exit.
+        """
+
         config = self.config
 
         if not self.pattern_can_fit():
@@ -139,7 +210,7 @@ class MazeGenerator:
                 if char == "X":
                     coord = Coordinate(x + offset_x, y + offset_y)
                     to_be_locked.append(coord)
-                    if coord == config.entry or coord == config.exit:
+                    if coord in {config.entry, config.exit}:
                         raise PatternError(
                             "Cannot place 42 pattern on entry or exit points"
                         )
@@ -149,7 +220,12 @@ class MazeGenerator:
         return grid
 
     def _initialize_grid(self) -> Grid:
-        """Generate the initial maze grid with shared closed walls."""
+        """Creates the initial maze grid with shared walls in the closed state.
+
+        Returns:
+            Grid: A newly initialized maze grid.
+        """
+
         grid: Grid = []
 
         for row in range(self.config.height):

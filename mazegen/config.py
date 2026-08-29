@@ -1,3 +1,5 @@
+"""Configuration parsing and validation for the maze application."""
+
 from types import ModuleType
 from typing import cast
 from pydantic import (
@@ -18,6 +20,21 @@ from . import algorithms, solvers, renderers
 
 
 class Operations(BaseModel):
+    """Defines the configurable maze operation implementations.
+
+    The operations model specifies the algorithm, solver, and renderer used by
+    the maze application. Each operation can be provided either as an instance
+    of its corresponding type or as the name of a class available in the
+    appropriate module.
+
+    Attributes:
+        algorithm (Algorithm): The maze-generation algorithm to use. Defaults
+            to `MazerTheMiner`.
+        solver (Solver): The maze-solving algorithm to use. Defaults to `BFS`.
+        renderer (Renderer): The maze renderer to use. Defaults to
+            `AsciiRenderer`.
+    """
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     algorithm: Algorithm = Field(default=MazerTheMiner())
@@ -29,6 +46,28 @@ class Operations(BaseModel):
     def _lookup_class(
         cls, value: str | ModuleType, info: ValidationInfo
     ) -> ModuleType:
+        """Resolve an operation name to an instantiated implementation.
+
+        String values are interpreted as class names and looked up in the
+        module corresponding to the validated field. Non-string values are
+        returned unchanged.
+
+        Args:
+            value: An operation instance or the name of an operation class.
+            info:
+                Pydantic validation information containing the field being
+                validated.
+
+        Returns:
+            The supplied non-string value, or an instantiated operation
+            corresponding to the supplied class name.
+
+        Raises:
+            PydanticCustomError:
+                If no operation with the supplied name exists in the module
+                associated
+        """
+
         if not isinstance(value, str):
             return value
 
@@ -51,7 +90,14 @@ class Operations(BaseModel):
 
 
 class Config(BaseModel):
-    """Handles validation for the maze attributes"""
+    """Stores and validates maze configuration attributes.
+
+    Attributes:
+        mandatory (Mandatory): Values required to generate the maze.
+        operations (Operations): Represents maze operations.
+        seed (str): Seed used for deterministic maze generation.
+        sps (int): Steps per second used during maze generation or display.
+    """
 
     mandatory: Mandatory
     operations: Operations
@@ -60,11 +106,23 @@ class Config(BaseModel):
 
 
 def parse_config(filepath: str) -> Config:
-    """Parses the given config file"""
+    """Parses a configuration file and validates its contents.
+
+    Args:
+        filepath (str): Path to the configuration file to read.
+
+    Returns:
+        A validated `Config` instance containing the parsed settings.
+
+    Raises:
+        ConfigError:
+            If the file cannot be read, contains invalid configuration values,
+            or has a malformed key/value pair.
+    """
 
     try:
         config: dict[str, str] = {}
-        with open(filepath) as f:
+        with open(filepath, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#"):
@@ -85,13 +143,19 @@ def parse_config(filepath: str) -> Config:
         raise ConfigError("Bad key/value format (expected 'key=value')") from e
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Parses the configuration file and displays the validated settings.
+
+    Raises:
+        ConfigError: If the configuration file is invalid or cannot be read.
+    """
+
     try:
         config = parse_config("config.txt")
         print("-" * 40)
         print("Testing config")
         print("-" * 40)
-        print(parse_config("config.txt").model_dump())
+        print(config.model_dump())
     except ConfigError as e:
         print(e)
         if e.validation:
@@ -101,3 +165,7 @@ if __name__ == "__main__":
                 loc = err.get("loc")
                 locs = ", ".join([str(lo) for lo in loc])
                 print(f"{locs}: {msg}")
+
+
+if __name__ == "__main__":
+    main()

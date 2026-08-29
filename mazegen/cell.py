@@ -1,3 +1,5 @@
+"""Maze grid, cell and wall representations."""
+
 from .models import Direction, Coordinate
 from .errors import LockedWallError
 
@@ -6,7 +8,7 @@ class Wall:
     """Represents a wall and it's closed state.
 
     Args:
-        closed (bool): Represents open/close state of the wall.
+        closed (bool): Whether the wall is open or close.
         locked (bool): Whether it is restricted to open/close the wall.
     """
 
@@ -33,7 +35,14 @@ class Wall:
 
 
 class Cell:
-    """Manages a collection of walls."""
+    """Manages a collection of walls.
+
+    Attributes:
+        location (Coordinate):
+            The cell's position inside a grid.
+        walls (dict[Direction, Wall]):
+            A mapping of directions to their corresponding walls.
+    """
 
     def __init__(
         self,
@@ -43,6 +52,16 @@ class Cell:
         south: Wall | None = None,
         west: Wall | None = None,
     ) -> None:
+        """Initialize a cell and its walls.
+
+        Args:
+            location: The cell's coordinate.
+            north: The wall to the north, or a default wall.
+            east: The wall to the east, or a default wall.
+            south: The wall to the south, or a default wall.
+            west: The wall to the west, or a default wall.
+        """
+
         self.location = location
         self.walls = {
             Direction.NORTH: north if north is not None else Wall(),
@@ -53,7 +72,7 @@ class Cell:
 
     @property
     def value(self) -> Direction:
-        """The integer flag representation of neighboring walls' states."""
+        """Get the bitwise flag representation of neighboring walls."""
 
         value = Direction(0)
         for direction, wall in self.walls.items():
@@ -62,7 +81,11 @@ class Cell:
         return value
 
     def lock(self) -> None:
-        """Locks all of the walls without raising an error."""
+        """Locks all of the walls without raising an error.
+
+        Unlocked walls are closed before being locked. Already locked walls
+        are left unchanged.
+        """
 
         for wall in self.walls.values():
             if not wall.locked:
@@ -70,15 +93,23 @@ class Cell:
                 wall.locked = True
 
     def neighbor(self, direction: Direction) -> Coordinate:
-        """Returns the coordinate of a neighboring cell in a given direction"""
+        """Returns the coordinate of a neighboring cell in a given direction
 
-        OFFSET = {
+        Args:
+            direction: The direction of the neighboring cell.
+
+        Returns:
+            Coordinate:
+                The coordinate adjacent to this cell in the given direction.
+        """
+
+        offset = {
             Direction.NORTH: (0, -1),
             Direction.EAST: (1, 0),
             Direction.SOUTH: (0, 1),
             Direction.WEST: (-1, 0),
         }
-        dx, dy = OFFSET[direction]
+        dx, dy = offset[direction]
         x, y = self.location
 
         return Coordinate(x + dx, y + dy)

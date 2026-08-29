@@ -1,3 +1,5 @@
+"""Core data models and configuration types for a maze."""
+
 from typing import NamedTuple, Self
 from enum import IntFlag
 from pydantic import (
@@ -6,8 +8,8 @@ from pydantic import (
     model_validator,
     ValidationError,
 )
-from pydantic_core import PydanticCustomError, InitErrorDetails
 from pydantic.dataclasses import dataclass as pydantic_dataclass
+from pydantic_core import PydanticCustomError, InitErrorDetails
 
 
 class Direction(IntFlag):
@@ -34,6 +36,16 @@ Path = list[Coordinate]
 
 @pydantic_dataclass
 class Mandatory:
+    """Required configuration for the maze.
+
+    Attributes:
+        entry (Coordinate): Starting coordinate.
+        exit (Coordinate): Destination coordinate.
+        perfect (bool): Whether perfect output is required.
+        width (int): Width of the output area. Must be at least 1.
+        height (int): Height of the output area. Must be at least 1.
+        output_file (str): Path to the output file. Must not be empty.
+    """
 
     entry: Coordinate
     exit: Coordinate
@@ -45,6 +57,23 @@ class Mandatory:
     @field_validator("entry", "exit", mode="before")
     @classmethod
     def _str_to_coordinate(cls, value: str | Coordinate) -> Coordinate:
+        """Convert a string coordinate to a Coordinate instance.
+
+        String coordinates must contain two comma-separated integers, such as
+        '4,2'.
+
+        Args:
+            value (str | Coordinate):
+                Location value as either a string or a `Coordinate`.
+
+        Returns:
+            Coordinate: A Coordinate instance.
+
+        Raises:
+            ValueError:
+                If the string is not in the expected format or contains values
+                that cannot be converted to integers.
+        """
         if isinstance(value, str):
             try:
                 x, y = value.split(",")
@@ -57,6 +86,23 @@ class Mandatory:
 
     @model_validator(mode="after")
     def _validate_entry_exit(self) -> Self:
+        """Validate entry and exit coordinates against the output bounds.
+
+        Ensures that the entry and exit points are different and that both
+        points lie within the configured width and height.
+
+        Args:
+            value (str | Coordinate):
+                Location value as either a string or a `Coordinate`.
+
+        Returns:
+            The validated `Mandatory` instance.
+
+        Raises:
+            ValidationError:
+                If the entry and exit points are identical or either point is
+                outside the configured bounds.
+        """
         errors: list[InitErrorDetails] = []
 
         if self.entry == self.exit:
