@@ -150,7 +150,7 @@ class Ascii:
             return self.wall_color
         return glyph.color
 
-    def on_colorchange(self) -> None:
+    def on_color_change(self) -> None:
         self.color_cursor += 1
 
     def on_quit(self) -> None:
@@ -169,7 +169,7 @@ class Ascii:
         QUIT = "Quit"
 
     actions = {
-        Option.CHANGE_COLOR: on_colorchange,
+        Option.CHANGE_COLOR: on_color_change,
         Option.QUIT: on_quit,
         Option.RECREATE: on_regen,
         Option.SHOW: on_show,
@@ -265,6 +265,9 @@ class AsciiRenderer(Renderer):
             ascii_view.regenerate = False
             generation = maze.generate()
             generating = True
+
+            stdscr.clear()
+
             try:
                 next(generation)
             except StopIteration:
