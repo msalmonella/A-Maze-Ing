@@ -25,6 +25,9 @@ class Coordinate(NamedTuple):
     x: int
     y: int
 
+    def __str__(self) -> str:
+        return f"({self.x}, {self.y})"
+
 
 Path = list[Coordinate]
 

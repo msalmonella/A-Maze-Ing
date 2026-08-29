@@ -175,6 +175,45 @@ class Ascii:
         Option.SHOW: on_show,
     }
 
+    def _draw_info(self, maze: mazegen.MazeGenerator) -> int:
+        config = maze.config
+        info = [
+            "Maze Configuration",
+            "",
+            f"{'Size:':16}"
+            f"{config.width} x {config.height}"
+            f" ({config.width * config.height} cells)",
+            f"{'Entry:':16}" f"{config.entry}",
+            f"{'Exit:':16}" f"{config.exit}",
+            f"{'Output File:':16}" f"{config.output_file}",
+            f"{'Perfect:':16}" f"{config.perfect}",
+            "",
+            f"{'Seed:':16}"
+            + (f"'{maze.seed}'" if maze.seed else "Not provided"),
+            f"{'Speed:':16}"
+            + (f"{maze.sps} steps/sec" if maze.sps != 0 else "Instant"),
+            f"{'Solution:':16}"
+            + (
+                f"{len(maze.solution)} cells"
+                if maze.solution
+                else "Generating"
+            ),
+            "",
+        ]
+
+        if not maze.pattern_can_fit():
+            info.extend(["WARNING: 42 pattern does not fit. Ommitting.", ""])
+
+        row_count = 0
+        for line in info:
+            try:
+                self.stdscr.addstr(row_count, 0, line)
+                row_count += 1
+            except curses.error:
+                pass
+
+        return row_count
+
     def _draw_glyph(self, y: int, x: int, glyph: Glyph) -> None:
         color = self._resolve_color(glyph)
         try:
@@ -206,13 +245,16 @@ class Ascii:
             for row in maze.grid
         ]
 
-        y = 0
+        row_count = 0
+
+        row_count += self._draw_info(maze)
+
         for sprite_row in sprites:
             for row in range(len(sprite_row[0].rows())):
-                self._draw_row(y, sprite_row, row)
-                y += 1
+                self._draw_row(row_count, sprite_row, row)
+                row_count += 1
 
-        y += 1
+        row_count += 1
 
         options = list(self.Option)
         for i, option in enumerate(options):
@@ -226,7 +268,7 @@ class Ascii:
                 suffix = ""
 
             try:
-                self.stdscr.addstr(y + i, 0, prefix + option + suffix)
+                self.stdscr.addstr(row_count + i, 0, prefix + option + suffix)
             except curses.error:
                 pass
 
