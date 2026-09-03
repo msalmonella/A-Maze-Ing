@@ -38,12 +38,6 @@ CONFIG	=	config.txt
 
 SRC		=	${MAIN} ./mazegen
 
-# RUN THIS BEFORE FINISHING THE PROJECT
-.build:
-	@printf "${BOLD}${MAGENTA}Building the package${RESET}\n"
-	@uv build --wheel
-	@mv dist/*.whl .
-	@rm --recursive --force dist
 
 install:
 	@printf "${BOLD}${BLUE}Synchronizing packages${RESET}\n"
@@ -82,5 +76,12 @@ lint-strict:
 	@uv run flake8 ${SRC} || true
 	@printf "${GREEN}Typing ${CYAN}(mypy ${RED}--strict${CYAN})${RESET}\n"
 	@uv run mypy ${SRC} --strict || true
+
+# RUN THIS BEFORE FINISHING THE PROJECT
+build:
+	@printf "${BOLD}${MAGENTA}Building the package${RESET}\n"
+	@uv build --wheel
+	@mv dist/*.whl .
+	@rm --recursive --force dist
 
 .PHONY: install run debug clean lint lint-strict .build
