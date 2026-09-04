@@ -1,3 +1,5 @@
+"""Maze generation algorithm using recursive wall digging."""
+
 import sys
 from random import Random
 from collections.abc import Generator
@@ -9,10 +11,24 @@ from ..models import Mandatory
 
 
 class MazerTheMiner(Algorithm):
+    """Generate a maze by recursively digging through walls."""
 
     def __call__(
         self, grid: Grid, config: Mandatory, rng: Random
     ) -> Generator[None]:
+        """Generate a maze using the Mazer the Miner algorithm.
+
+        Args:
+            grid (Grid): The grid in which the maze will be generated.
+            config (Mandatory):
+                Maze configuration containing the grid dimensions.
+            rng (random.Random):
+                Random number generator used to randomize directions.
+
+        Returns:
+            Generator: A generator that yields after each wall is opened.
+        """
+
         self._apply_recursion_limit(config.width, config.height)
         return self.mazer_the_miner(grid, rng, Coordinate(0, 0), set())
 
@@ -23,7 +39,18 @@ class MazerTheMiner(Algorithm):
         head: Coordinate,
         processed: set[Coordinate],
     ) -> Generator[None]:
-        """Recursive function to create maze by digging into walls"""
+        """Recursively generate a maze by digging through walls.
+
+        Args:
+            grid (Grid): The grid in which the maze is being generated.
+            rng (Random): Random number generator used to randomize directions.
+            head (Coordinate): Coordinate of the current cell being processed.
+            processed (set[Coordinate]):
+                Set of coordinates that have already been visited.
+
+        Yields:
+            Generator: None after successfully opening a wall.
+        """
 
         x, y = head
         cell = grid[y][x]
@@ -49,6 +76,13 @@ class MazerTheMiner(Algorithm):
 
     @staticmethod
     def _apply_recursion_limit(width: int, height: int) -> None:
+        """Increase the recursion limit when the grid requires it.
+
+        Args:
+            width (int): Width of the maze grid in cells.
+            height (int): Height of the maze grid in cells.
+        """
+
         cell_count = width * height
         wall_count = 4
         needed = cell_count * wall_count

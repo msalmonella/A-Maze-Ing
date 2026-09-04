@@ -1,3 +1,5 @@
+"""Maze generation using randomized Prim's minimum spanning tree algorithm."""
+
 from random import Random
 from collections.abc import Generator
 from . import Algorithm
@@ -12,6 +14,18 @@ class Prim(Algorithm):
     def __call__(
         self, grid: Grid, config: Mandatory, rng: Random
     ) -> Generator[None]:
+        """Generate a maze using randomized Prim's algorithm.
+
+        Args:
+            grid (Grid): The grid in which the maze will be generated.
+            config (Mandatory):
+                Maze configuration containing the entry coordinate.
+            rng (random.Random):
+                Random number generator used to select frontiers.
+
+        Returns:
+            A generator that yields after each wall is opened.
+        """
         return self.prim(grid, config, rng)
 
     def prim(
@@ -20,12 +34,32 @@ class Prim(Algorithm):
         config: Mandatory,
         rng: Random,
     ) -> Generator[None]:
-        """Function to create maze by Prim's minimal spanning tree algorithm"""
+        """Method to create maze by Prim's minimal spanning tree algorithm.
+
+        Args:
+            grid (Grid): The grid in which the maze will be generated.
+            config (Mandatory):
+                Maze configuration containing the entry coordinate.
+            rng (random.Random):
+                Random number generator used to select frontiers.
+
+        Yields:
+            None after successfully opening a wall between a visited cell
+            and a frontier cell.
+        """
 
         frontiers: list[tuple[Wall, Coordinate]] = []
         visited: set[Coordinate] = {config.entry}
 
         def add_frontiers(coord: Coordinate) -> None:
+            """Add unvisited neighboring cells to the frontier list.
+
+            Args:
+                coord (Coordinate):
+                    Coordinate of the cell whose neighbors are added to the
+                    frontier list.
+            """
+
             x, y = coord
             cell = grid[y][x]
 

@@ -1,3 +1,5 @@
+"""Abstract interface for maze generation algorithms."""
+
 from abc import ABC, abstractmethod
 from random import Random
 from collections.abc import Generator
@@ -6,6 +8,7 @@ from ..cell import Grid
 
 
 class Algorithm(ABC):
+    """Generate a maze on the given grid."""
 
     @abstractmethod
     def __call__(
