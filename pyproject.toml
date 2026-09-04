@@ -10,7 +10,7 @@ authors = [
     { name = "Cahit Atilla Bozkurt" },
     { name = "Ahmet Yasin Dede", email = "ahmetyasindd@gmail.com" }
 ]
-readme = "mazegen/_README.md"
+readme = "mazegen/README.md"
 requires-python = ">=3.10"
 dependencies = [
     "mlx",
