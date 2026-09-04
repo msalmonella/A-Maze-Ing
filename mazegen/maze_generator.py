@@ -167,13 +167,13 @@ class MazeGenerator:
             next_x, next_y = next_cell
 
             if next_y > current_y:
-                nesw.append("N")
+                nesw.append("S")
 
             if next_x > current_x:
                 nesw.append("E")
 
             if current_y > next_y:
-                nesw.append("S")
+                nesw.append("N")
 
             if current_x > next_x:
                 nesw.append("W")
