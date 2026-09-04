@@ -1,3 +1,5 @@
+"""Breadth-first search solver for grid-based pathfinding."""
+
 from . import Solver
 from ..models import Coordinate, Path, Direction
 from ..cell import Grid
@@ -5,9 +7,20 @@ from ..models import Mandatory
 
 
 class BFS(Solver):
-    """BFS"""
+    """Solve grid paths using the breadth-first search algorithm."""
 
     def __call__(self, grid: Grid, config: Mandatory) -> Path:
+        """Find the shortest path from the entry to the exit.
+
+        Args:
+            grid (Grid): The grid to search for a path through.
+            config (Mandatory):
+                Configuration containing the entry and exit coordinates.
+
+        Returns:
+            Path: A path from the entry coordinate to the exit coordinate.
+        """
+
         path: Path = []
         node: Coordinate | None = config.exit
         queue: Path = [config.entry]
@@ -17,6 +30,8 @@ class BFS(Solver):
         def qvc_appender(
             current_pos: Coordinate, queue_pos: Coordinate
         ) -> None:
+            """Add an unvisited neighboring coordinate to the search queue."""
+
             if queue_pos not in visited:
                 queue.append(queue_pos)
                 visited.add(queue_pos)
