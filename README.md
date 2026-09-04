@@ -1,6 +1,6 @@
 _This project has been created as part of the 42 curriculum by cbozkurt, adede._
 
-# A-Maze-ing
+# A-Maze-Ing
 
 > This is the way
 
