@@ -141,7 +141,7 @@ Lines beginning with `#` are treated as comments and ignored.
   Available solvers for `SOLVER`:
   - `BFS`
 
-  Available solvers for `SOLVER`:
+  Available renderers for `RENDERER`:
   - `AsciiRenderer`
 
 # Maze Generation Algorithm
