@@ -117,7 +117,7 @@ class Mandatory:
             )
 
         for name, point in [("entry", self.entry), ("exit", self.exit)]:
-            if point.x >= self.width or point.y >= self.height:
+            if not (0 <= point.x < self.width and 0 <= point.y < self.height):
                 errors.append(
                     {
                         "type": PydanticCustomError(
