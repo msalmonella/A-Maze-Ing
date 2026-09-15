@@ -145,7 +145,7 @@ class MazeGenerator:
             f.write("\n")
             f.write(f"{entry_x},{entry_y}\n")
             f.write(f"{exit_x},{exit_y}\n")
-            f.write(f"{"".join(self._nesw_conversion(solution))}")
+            f.write(f"{"".join(self._nesw_conversion(solution))}\n")
 
     @staticmethod
     def _nesw_conversion(path: Path) -> list[str]:
