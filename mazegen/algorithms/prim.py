@@ -49,7 +49,7 @@ class Prim(Algorithm):
         """
 
         frontiers: list[tuple[Wall, Coordinate]] = []
-        visited: set[Coordinate] = {config.entry}
+        visited: set[Coordinate] = set()
 
         def add_frontiers(coord: Coordinate) -> None:
             """Add unvisited neighboring cells to the frontier list.
@@ -69,7 +69,12 @@ class Prim(Algorithm):
                     if next_cell not in visited:
                         frontiers.append((wall, next_cell))
 
-        add_frontiers(config.entry)
+        while not frontiers:
+            start_point = Coordinate(
+                rng.randrange(0, config.width) if config.width else 0,
+                rng.randrange(0, config.height) if config.height else 0,
+            )
+            add_frontiers(start_point)
 
         while frontiers:
             frontier, coord = frontiers.pop(rng.randrange(len(frontiers)))
