@@ -80,8 +80,6 @@ lint-strict:
 # RUN THIS BEFORE FINISHING THE PROJECT
 build:
 	@printf "${BOLD}${MAGENTA}Building the package${RESET}\n"
-	@uv build --wheel
-	@mv dist/*.whl .
-	@rm --recursive --force dist
+	@uv build --wheel --out-dir .
 
 .PHONY: install run debug clean lint lint-strict .build
